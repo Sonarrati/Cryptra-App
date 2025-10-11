@@ -1,67 +1,198 @@
-import { supabase, requireAuth, formatMicrodollars, toMicrodollars, getRandomReward } from './supabaseClient.js'
+import { supabase, requireAuth, formatMicrodollars, toMicrodollars, getRandomReward, isDemoMode, demoData, demoUserData } from './supabaseClient.js'
+
+let currentUser = null
 
 document.addEventListener('DOMContentLoaded', async function() {
-    const user = requireAuth()
-    if (!user) return
+    console.log('Dashboard loading...')
+    
+    try {
+        currentUser = requireAuth()
+        if (!currentUser) {
+            console.log('User not authenticated')
+            return
+        }
 
-    await loadDashboardData()
-    setupEventListeners()
+        console.log('User authenticated:', currentUser.email)
+        
+        // Show demo banner if in demo mode
+        if (isDemoMode()) {
+            showDemoBanner()
+        }
+        
+        await loadDashboardData()
+        setupEventListeners()
+        
+    } catch (error) {
+        console.error('Dashboard initialization error:', error)
+    }
 })
 
+function showDemoBanner() {
+    const banner = document.createElement('div')
+    banner.className = 'demo-mode-banner'
+    banner.innerHTML = `
+        <i class="fas fa-info-circle"></i>
+        Demo Mode - All features are functional but data is temporary
+    `
+    document.querySelector('.content').prepend(banner)
+}
+
 async function loadDashboardData() {
+    console.log('Loading dashboard data...')
+    
     try {
-        // Load user balance
-        const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('balance_microusd, total_earnings_microusd, last_checkin_date, streak_days')
-            .eq('id', JSON.parse(localStorage.getItem('cryptra_user')).id)
-            .single()
-
-        if (userError) throw userError
-
-        document.getElementById('userBalance').textContent = '$' + formatMicrodollars(userData.balance_microusd)
-        document.getElementById('streakDays').textContent = userData.streak_days || 0
-
-        // Check if already checked in today
-        const today = new Date().toISOString().split('T')[0]
-        const checkinBtn = document.getElementById('checkinBtn')
-        if (userData.last_checkin_date === today) {
-            checkinBtn.textContent = 'Already Checked In'
-            checkinBtn.disabled = true
-            checkinBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+        if (isDemoMode()) {
+            // Load demo data
+            loadDemoData()
+        } else {
+            // Load real data from Supabase
+            await loadRealData()
         }
 
-        // Load referral stats
-        const { data: referralData, error: referralError } = await supabase
-            .from('referrals')
-            .select('referred_user_id')
-            .eq('user_id', JSON.parse(localStorage.getItem('cryptra_user')).id)
-
-        if (!referralError) {
-            document.getElementById('totalReferrals').textContent = referralData.length
-        }
-
-        // Load commission data
-        const { data: commissionData, error: commissionError } = await supabase
-            .from('earnings')
-            .select('amount_microusd')
-            .eq('user_id', JSON.parse(localStorage.getItem('cryptra_user')).id)
-            .eq('source', 'referral_commission')
-
-        if (!commissionError) {
-            const totalCommission = commissionData.reduce((sum, earning) => sum + earning.amount_microusd, 0)
-            document.getElementById('totalCommission').textContent = '$' + formatMicrodollars(totalCommission)
-        }
-
-        // Load recent winners
-        await loadWinners()
-
-        // Load recent activity
-        await loadRecentActivity()
+        console.log('Dashboard data loaded successfully')
 
     } catch (error) {
-        console.error('Error loading dashboard:', error)
+        console.error('Error loading dashboard data:', error)
+        // Fallback to demo data on error
+        loadDemoData()
     }
+}
+
+function loadDemoData() {
+    // User balance
+    document.getElementById('userBalance').textContent = '$' + formatMicrodollars(demoUserData.balance_microusd)
+    document.getElementById('streakDays').textContent = demoUserData.streak_days
+    
+    // Check if already checked in today
+    const today = new Date().toISOString().split('T')[0]
+    const checkinBtn = document.getElementById('checkinBtn')
+    
+    if (demoUserData.last_checkin_date === today) {
+        checkinBtn.textContent = 'Already Checked In'
+        checkinBtn.disabled = true
+        checkinBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+    }
+
+    // Referral stats
+    document.getElementById('totalReferrals').textContent = demoData.referrals.length
+    document.getElementById('activeReferrals').textContent = '2' // Demo active referrals
+    
+    // Total commission
+    const totalCommission = demoData.earnings
+        .filter(e => e.source === 'referral_commission')
+        .reduce((sum, e) => sum + e.amount_microusd, 0)
+    document.getElementById('totalCommission').textContent = '$' + formatMicrodollars(totalCommission)
+    
+    // Load winners
+    loadDemoWinners()
+    
+    // Load recent activity
+    loadDemoActivity()
+}
+
+async function loadRealData() {
+    // Load user balance
+    const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('balance_microusd, total_earnings_microusd, last_checkin_date, streak_days')
+        .eq('id', currentUser.id)
+        .single()
+
+    if (userError) throw userError
+
+    document.getElementById('userBalance').textContent = '$' + formatMicrodollars(userData.balance_microusd)
+    document.getElementById('streakDays').textContent = userData.streak_days || 0
+
+    // Check if already checked in today
+    const today = new Date().toISOString().split('T')[0]
+    const checkinBtn = document.getElementById('checkinBtn')
+    if (userData.last_checkin_date === today) {
+        checkinBtn.textContent = 'Already Checked In'
+        checkinBtn.disabled = true
+        checkinBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+    }
+
+    // Load referral stats
+    const { data: referralData, error: referralError } = await supabase
+        .from('referrals')
+        .select('referred_user_id')
+        .eq('user_id', currentUser.id)
+
+    if (!referralError) {
+        document.getElementById('totalReferrals').textContent = referralData.length
+    }
+
+    // Load commission data
+    const { data: commissionData, error: commissionError } = await supabase
+        .from('earnings')
+        .select('amount_microusd')
+        .eq('user_id', currentUser.id)
+        .eq('source', 'referral_commission')
+
+    if (!commissionError) {
+        const totalCommission = commissionData.reduce((sum, earning) => sum + earning.amount_microusd, 0)
+        document.getElementById('totalCommission').textContent = '$' + formatMicrodollars(totalCommission)
+    }
+
+    // Load recent winners
+    await loadWinners()
+
+    // Load recent activity
+    await loadRecentActivity()
+}
+
+function loadDemoWinners() {
+    const winnersList = document.getElementById('winnersList')
+    winnersList.innerHTML = ''
+    
+    demoData.winners.slice(0, 3).forEach(winner => {
+        const winnerItem = document.createElement('div')
+        winnerItem.className = 'winner-item'
+        winnerItem.innerHTML = `
+            <div class="winner-info">
+                <div class="winner-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="winner-name">User ${winner.user_id.substring(0, 8)}</div>
+            </div>
+            <div class="winner-prize">$${formatMicrodollars(winner.prize_microusd)}</div>
+        `
+        winnersList.appendChild(winnerItem)
+    })
+}
+
+function loadDemoActivity() {
+    const activityList = document.getElementById('recentActivity')
+    activityList.innerHTML = ''
+
+    demoData.earnings.forEach(activity => {
+        const activityItem = document.createElement('div')
+        activityItem.className = 'activity-item'
+        
+        const iconMap = {
+            'signup_bonus': 'user-plus',
+            'referral_bonus': 'users',
+            'watch_ad': 'play-circle',
+            'scratch': 'scroll',
+            'treasure': 'gem',
+            'daily_checkin': 'check-circle',
+            'referral_commission': 'money-bill-wave'
+        }
+
+        activityItem.innerHTML = `
+            <div class="activity-info">
+                <div class="activity-icon">
+                    <i class="fas fa-${iconMap[activity.source] || 'dollar-sign'}"></i>
+                </div>
+                <div class="activity-details">
+                    <h4>${formatSourceName(activity.source)}</h4>
+                    <p>${new Date(activity.created_at).toLocaleDateString()}</p>
+                </div>
+            </div>
+            <div class="activity-amount positive">+$${formatMicrodollars(activity.amount_microusd)}</div>
+        `
+        activityList.appendChild(activityItem)
+    })
 }
 
 async function loadWinners() {
@@ -104,7 +235,7 @@ async function loadRecentActivity() {
         const { data: activities, error } = await supabase
             .from('earnings')
             .select('source, amount_microusd, created_at')
-            .eq('user_id', JSON.parse(localStorage.getItem('cryptra_user')).id)
+            .eq('user_id', currentUser.id)
             .order('created_at', { ascending: false })
             .limit(5)
 
@@ -167,14 +298,16 @@ function setupEventListeners() {
     const notificationIcon = document.querySelector('.notification-icon')
     const notificationDropdown = document.querySelector('.notification-dropdown')
     
-    notificationIcon.addEventListener('click', function(e) {
-        e.stopPropagation()
-        notificationDropdown.classList.toggle('active')
-    })
+    if (notificationIcon) {
+        notificationIcon.addEventListener('click', function(e) {
+            e.stopPropagation()
+            notificationDropdown.classList.toggle('active')
+        })
 
-    document.addEventListener('click', function() {
-        notificationDropdown.classList.remove('active')
-    })
+        document.addEventListener('click', function() {
+            notificationDropdown.classList.remove('active')
+        })
+    }
 }
 
 async function handleDailyCheckin() {
@@ -185,7 +318,44 @@ async function handleDailyCheckin() {
     checkinBtn.disabled = true
 
     try {
-        const user = JSON.parse(localStorage.getItem('cryptra_user'))
+        if (isDemoMode()) {
+            // Demo check-in
+            setTimeout(() => {
+                const reward = getRandomReward(0.001, 0.005)
+                
+                // Update UI
+                document.getElementById('streakDays').textContent = '1'
+                document.getElementById('userBalance').textContent = '$' + formatMicrodollars(demoUserData.balance_microusd + reward)
+                
+                checkinBtn.textContent = 'Already Checked In'
+                checkinBtn.disabled = true
+                checkinBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+
+                // Add to activity
+                const activityList = document.getElementById('recentActivity')
+                const activityItem = document.createElement('div')
+                activityItem.className = 'activity-item'
+                activityItem.innerHTML = `
+                    <div class="activity-info">
+                        <div class="activity-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>Daily Check-in</h4>
+                            <p>${new Date().toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                    <div class="activity-amount positive">+$${formatMicrodollars(reward)}</div>
+                `
+                activityList.prepend(activityItem)
+
+                alert(`Daily check-in successful! You earned $${formatMicrodollars(reward)}`)
+            }, 1000)
+            
+            return
+        }
+
+        const user = currentUser
         const today = new Date().toISOString().split('T')[0]
 
         // Check if already checked in today
@@ -206,7 +376,7 @@ async function handleDailyCheckin() {
 
         // Generate random reward between $0.001 - $0.005 (with 10% chance of $0)
         let reward = 0
-        if (Math.random() > 0.1) { // 90% chance of getting reward
+        if (Math.random() > 0.1) {
             reward = getRandomReward(0.001, 0.005)
         }
 
@@ -225,7 +395,7 @@ async function handleDailyCheckin() {
         // Update user streak and balance
         const { data: userData } = await supabase
             .from('users')
-            .select('streak_days, last_checkin_date')
+            .select('streak_days, last_checkin_date, balance_microusd')
             .eq('id', user.id)
             .single()
 
