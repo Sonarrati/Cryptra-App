@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch & Earn - Cryptra</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <div class="app-title">Cryptra</div>
+            <div class="notification-icon">
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="notification-badge">3</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Watch & Earn Stats -->
+            <div class="card">
+                <div class="card-title">Watch & Earn</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="todayWatches">0/20</div>
+                        <div class="stat-label">Today's Watches</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="todayEarnings">$0.00</div>
+                        <div class="stat-label">Today's Earnings</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Container -->
+            <div class="card">
+                <div class="ad-container">
+                    <div class="ad-placeholder">
+                        <i class="fas fa-play-circle"></i>
+                        <h3>Watch Ad to Earn</h3>
+                        <p>Watch this ad completely to earn money</p>
+                    </div>
+                    <div class="ad-timer" id="adTimer" style="display: none;">
+                        <div class="timer-circle">
+                            <span id="timerCount">30</span>s
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-full" id="watchAdBtn">
+                    Start Watching Ad
+                </button>
+            </div>
+
+            <!-- Recent Earnings -->
+            <div class="card">
+                <div class="card-title">Recent Earnings from Ads</div>
+                <div class="activity-list" id="watchEarnings">
+                    <!-- Earnings will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <span>Home</span>
+            </a>
+            <a href="referral.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-users"></i></div>
+                <span>Referral</span>
+            </a>
+            <a href="luckydraw.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-gift"></i></div>
+                <span>Lucky Draw</span>
+            </a>
+            <a href="leaderboard.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-trophy"></i></div>
+                <span>Leaderboard</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <script type="module" src="assets/supabaseClient.js"></script>
+    <script type="module" src="assets/watch.js"></script>
+</body>
+</html>
