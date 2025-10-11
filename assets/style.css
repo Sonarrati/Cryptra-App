@@ -1,0 +1,743 @@
+/* Additional Styles for Complete Application */
+
+/* Referral Page Styles */
+.referral-link-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.referral-link-input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid var(--light);
+    border-radius: var(--radius-sm);
+    background-color: var(--light);
+}
+
+.referral-note {
+    font-size: 14px;
+    color: var(--gray);
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.stat-card {
+    background-color: var(--light);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+}
+
+.levels-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.level-item {
+    background-color: var(--light);
+    border-radius: var(--radius-sm);
+    padding: 12px 8px;
+    text-align: center;
+}
+
+.level-number {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray);
+}
+
+.level-percent {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.referral-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.referral-item:last-child {
+    border-bottom: none;
+}
+
+.referral-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.referral-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-dark);
+}
+
+.referral-status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.referral-status.active {
+    background-color: var(--success);
+    color: white;
+}
+
+.referral-status.inactive {
+    background-color: var(--gray);
+    color: white;
+}
+
+/* Watch & Earn Styles */
+.ad-container {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.ad-placeholder {
+    background: linear-gradient(135deg, #4F46E5, #7C3AED);
+    color: white;
+    padding: 40px 20px;
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+
+.ad-placeholder i {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.ad-timer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+}
+
+.timer-circle {
+    width: 80px;
+    height: 80px;
+    border: 4px solid var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* Scratch Card Styles */
+.scratch-container {
+    position: relative;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+}
+
+#scratchCanvas {
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+}
+
+.scratch-prize {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+}
+
+.scratch-prize i {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.prize-amount {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* Treasure Box Styles */
+.treasure-container {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.treasure-chest {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.treasure-chest:hover {
+    transform: scale(1.1);
+}
+
+.treasure-chest i {
+    font-size: 48px;
+    color: white;
+}
+
+.treasure-reward {
+    margin-top: 20px;
+}
+
+.prize-reveal {
+    text-align: center;
+    color: white;
+}
+
+.prize-reveal i {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.prize-reveal h3 {
+    margin-bottom: 8px;
+}
+
+/* Lucky Draw Styles */
+.draw-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.coin-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.coin-option {
+    background-color: var(--light);
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.coin-option.selected {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.coin-amount {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.coin-value {
+    font-size: 14px;
+    color: var(--gray);
+}
+
+.entry-list {
+    margin-top: 16px;
+}
+
+.entry-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.entry-item:last-child {
+    border-bottom: none;
+}
+
+.entry-date {
+    font-weight: 500;
+}
+
+.entry-details {
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+    color: var(--gray);
+}
+
+/* Tasks Styles */
+.tasks-list {
+    margin-top: 16px;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: var(--light);
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+}
+
+.task-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.task-info h4 {
+    margin-bottom: 4px;
+}
+
+.task-info p {
+    font-size: 14px;
+    color: var(--gray);
+    margin-bottom: 8px;
+}
+
+.task-reward {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Marketplace Styles */
+.marketplace-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.marketplace-item {
+    background-color: var(--light);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.item-image {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    color: white;
+    font-size: 24px;
+}
+
+.item-info h4 {
+    margin-bottom: 8px;
+}
+
+.item-type {
+    font-size: 14px;
+    color: var(--gray);
+    margin-bottom: 8px;
+}
+
+.item-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.item-stock {
+    font-size: 14px;
+    color: var(--gray);
+}
+
+.item-stock.out-of-stock {
+    color: var(--danger);
+}
+
+/* Withdrawal Styles */
+.withdrawal-info {
+    margin-bottom: 16px;
+}
+
+.withdrawal-info p {
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.method-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.method-option {
+    background-color: var(--light);
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.method-option.selected {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.method-option i {
+    font-size: 24px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.method-details {
+    margin-top: 16px;
+}
+
+.withdrawal-history {
+    margin-top: 16px;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.history-status.requested {
+    background-color: #FBBF24;
+    color: var(--dark);
+}
+
+.history-status.processed {
+    background-color: var(--success);
+    color: white;
+}
+
+.history-status.rejected {
+    background-color: var(--danger);
+    color: white;
+}
+
+/* Leaderboard Styles */
+.leaderboard-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.leaderboard-list {
+    margin-top: 16px;
+}
+
+.leader-item {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: var(--light);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+}
+
+.leader-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.leader-rank {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin-right: 16px;
+}
+
+.leader-item.rank-1 .leader-rank {
+    background-color: #F59E0B;
+}
+
+.leader-item.rank-2 .leader-rank {
+    background-color: #6B7280;
+}
+
+.leader-item.rank-3 .leader-rank {
+    background-color: #92400E;
+}
+
+.leader-info {
+    flex: 1;
+}
+
+.leader-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.leader-earnings {
+    font-size: 14px;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Profile Styles */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 32px;
+}
+
+.profile-info h3 {
+    margin-bottom: 4px;
+}
+
+.profile-info p {
+    color: var(--gray);
+}
+
+.settings-list {
+    margin-top: 16px;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    text-decoration: none;
+    color: inherit;
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-item i:first-child {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+}
+
+.setting-item span {
+    flex: 1;
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+/* Admin Styles */
+.admin-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.admin-tab-content {
+    display: none;
+}
+
+.admin-tab-content.active {
+    display: block;
+}
+
+.admin-task-item,
+.admin-product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.admin-task-item:last-child,
+.admin-product-item:last-child {
+    border-bottom: none;
+}
+
+.task-actions,
+.product-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.withdrawal-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.withdrawal-item:last-child {
+    border-bottom: none;
+}
+
+.withdrawal-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.status.active {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.status.inactive {
+    color: var(--gray);
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--gray);
+}
+
+.faq-item,
+.privacy-content h4,
+.support-content h4 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.contact-methods,
+.common-issues {
+    margin-top: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .levels-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .coin-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .method-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-tabs {
+        flex-direction: column;
+    }
+}
