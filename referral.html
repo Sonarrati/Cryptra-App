@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral System - Cryptra</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <div class="app-title">Cryptra</div>
+            <div class="notification-icon">
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="notification-badge">3</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Referral Link Section -->
+            <div class="card">
+                <div class="card-title">Your Referral Link</div>
+                <div class="referral-link-container">
+                    <input type="text" id="referralLink" readonly class="referral-link-input">
+                    <button class="btn btn-primary" id="copyLinkBtn">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                <p class="referral-note">Earn 7-level commissions from every person you refer!</p>
+            </div>
+
+            <!-- Referral Stats -->
+            <div class="card">
+                <div class="card-title">Referral Statistics</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalReferrals">0</div>
+                        <div class="stat-label">Total Referrals</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeReferrals">0</div>
+                        <div class="stat-label">Active Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalCommission">$0.00</div>
+                        <div class="stat-label">Total Commission</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Commission Levels -->
+            <div class="card">
+                <div class="card-title">7-Level Commission Structure</div>
+                <div class="levels-grid">
+                    <div class="level-item">
+                        <div class="level-number">1</div>
+                        <div class="level-percent">4.5%</div>
+                    </div>
+                    <div class="level-item">
+                        <div class="level-number">2</div>
+                        <div class="level-percent">2.5%</div>
+                    </div>
+                    <div class="level-item">
+                        <div class="level-number">3</div>
+                        <div class="level-percent">1.5%</div>
+                    </div>
+                    <div class="level-item">
+                        <div class="level-number">4</div>
+                        <div class="level-percent">0.8%</div>
+                    </div>
+                    <div class="level-item">
+                        <div class="level-number">5</div>
+                        <div class="level-percent">0.4%</div>
+                    </div>
+                    <div class="level-item">
+                        <div class="level-number">6</div>
+                        <div class="level-percent">0.2%</div>
+                    </div>
+                    <div class="level-item">
+                        <div class="level-number">7</div>
+                        <div class="level-percent">0.05%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referral List -->
+            <div class="card">
+                <div class="card-title">Your Referrals</div>
+                <div class="referral-list" id="referralList">
+                    <!-- Referrals will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <span>Home</span>
+            </a>
+            <a href="referral.html" class="nav-item active">
+                <div class="nav-icon"><i class="fas fa-users"></i></div>
+                <span>Referral</span>
+            </a>
+            <a href="luckydraw.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-gift"></i></div>
+                <span>Lucky Draw</span>
+            </a>
+            <a href="leaderboard.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-trophy"></i></div>
+                <span>Leaderboard</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <script type="module" src="assets/supabaseClient.js"></script>
+    <script type="module" src="assets/referral.js"></script>
+</body>
+</html>
