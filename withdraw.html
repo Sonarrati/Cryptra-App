@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw - Cryptra</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <div class="app-title">Cryptra</div>
+            <div class="notification-icon">
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="notification-badge">3</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Withdrawal Info -->
+            <div class="card">
+                <div class="card-title">Withdraw Funds</div>
+                <div class="withdrawal-info">
+                    <p>Minimum: <span id="minAmount">$3.00</span></p>
+                    <p>Maximum: <span id="maxAmount">$5.00</span></p>
+                    <p>Limit: One withdrawal per day</p>
+                </div>
+            </div>
+
+            <!-- Withdrawal Form -->
+            <div class="card">
+                <div class="card-title">Request Withdrawal</div>
+                <form id="withdrawForm">
+                    <div class="form-group">
+                        <label>Amount ($)</label>
+                        <input type="number" id="amount" step="0.01" min="3" max="5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Withdrawal Method</label>
+                        <div class="method-options">
+                            <div class="method-option" data-method="upi">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>UPI</span>
+                            </div>
+                            <div class="method-option" data-method="paypal">
+                                <i class="fab fa-paypal"></i>
+                                <span>PayPal</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="withdrawMethod" required>
+                    </div>
+
+                    <div id="upiDetails" class="method-details" style="display: none;">
+                        <div class="form-group">
+                            <label>UPI ID</label>
+                            <input type="text" id="upiId" placeholder="yourname@upi">
+                        </div>
+                    </div>
+
+                    <div id="paypalDetails" class="method-details" style="display: none;">
+                        <div class="form-group">
+                            <label>PayPal Email</label>
+                            <input type="email" id="paypalEmail" placeholder="your-email@example.com">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">
+                        Request Withdrawal
+                    </button>
+                </form>
+            </div>
+
+            <!-- Withdrawal History -->
+            <div class="card">
+                <div class="card-title">Withdrawal History</div>
+                <div class="withdrawal-history" id="withdrawHistory">
+                    <!-- History will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <span>Home</span>
+            </a>
+            <a href="referral.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-users"></i></div>
+                <span>Referral</span>
+            </a>
+            <a href="luckydraw.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-gift"></i></div>
+                <span>Lucky Draw</span>
+            </a>
+            <a href="leaderboard.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-trophy"></i></div>
+                <span>Leaderboard</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <script type="module" src="assets/supabaseClient.js"></script>
+    <script type="module" src="assets/withdraw.js"></script>
+</body>
+</html>
