@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Draw - Cryptra</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <div class="app-title">Cryptra</div>
+            <div class="notification-icon">
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="notification-badge">3</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Current Draw Info -->
+            <div class="card">
+                <div class="card-title">Today's Lucky Draw</div>
+                <div class="draw-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="currentPool">$0.00</div>
+                        <div class="stat-label">Current Pool</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="userEntries">0</div>
+                        <div class="stat-label">Your Entries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="userCoins">0</div>
+                        <div class="stat-label">Your Coins</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enter Draw -->
+            <div class="card">
+                <div class="card-title">Enter Lucky Draw</div>
+                <div class="coin-options">
+                    <div class="coin-option" data-coins="10">
+                        <div class="coin-amount">10 Coins</div>
+                        <div class="coin-value">$0.01</div>
+                    </div>
+                    <div class="coin-option" data-coins="50">
+                        <div class="coin-amount">50 Coins</div>
+                        <div class="coin-value">$0.05</div>
+                    </div>
+                    <div class="coin-option" data-coins="100">
+                        <div class="coin-amount">100 Coins</div>
+                        <div class="coin-value">$0.10</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-full" id="enterDrawBtn">
+                    Enter Draw
+                </button>
+            </div>
+
+            <!-- Winners History -->
+            <div class="card">
+                <div class="card-title">Recent Winners</div>
+                <div class="winner-list" id="winnersHistory">
+                    <!-- Winners will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Your Entries -->
+            <div class="card">
+                <div class="card-title">Your Entry History</div>
+                <div class="entry-list" id="userEntriesList">
+                    <!-- Entries will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <span>Home</span>
+            </a>
+            <a href="referral.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-users"></i></div>
+                <span>Referral</span>
+            </a>
+            <a href="luckydraw.html" class="nav-item active">
+                <div class="nav-icon"><i class="fas fa-gift"></i></div>
+                <span>Lucky Draw</span>
+            </a>
+            <a href="leaderboard.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-trophy"></i></div>
+                <span>Leaderboard</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <script type="module" src="assets/supabaseClient.js"></script>
+    <script type="module" src="assets/luckydraw.js"></script>
+</body>
+</html>
