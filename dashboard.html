@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Cryptra</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <div class="app-title">Cryptra</div>
+            <div class="notification-icon">
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="notification-badge">3</div>
+                <div class="notification-dropdown">
+                    <div class="notification-header">
+                        <span>Notifications</span>
+                        <span class="mark-all-read">Mark all as read</span>
+                    </div>
+                    <div class="notification-list">
+                        <div class="notification-item unread">
+                            <div>Daily check-in reward added</div>
+                            <div class="notification-time">2 minutes ago</div>
+                        </div>
+                        <div class="notification-item unread">
+                            <div>New task available: Complete survey</div>
+                            <div class="notification-time">1 hour ago</div>
+                        </div>
+                        <div class="notification-item">
+                            <div>Your withdrawal was processed</div>
+                            <div class="notification-time">Yesterday</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- My Balance Section -->
+            <div class="card balance-card">
+                <div class="card-title">My Balance</div>
+                <div class="balance" id="userBalance">$0.00</div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="location.href='withdraw.html'">
+                        <i class="fas fa-wallet"></i> Withdraw
+                    </button>
+                    <button class="btn btn-outline" onclick="location.href='marketplace.html'">
+                        <i class="fas fa-store"></i> Marketplace
+                    </button>
+                </div>
+            </div>
+
+            <!-- Daily Check-in Section -->
+            <div class="card checkin-card">
+                <div class="card-title">Daily Check-in</div>
+                <div class="streak">
+                    <div class="streak-days" id="streakDays">0</div>
+                    <div class="streak-label">Day Streak<br>Claim your reward!</div>
+                </div>
+                <button class="checkin-btn" id="checkinBtn">Check-in Now</button>
+            </div>
+
+            <!-- Referral Commission Section -->
+            <div class="card commission-card">
+                <div class="card-title">Referral Commission</div>
+                <div class="commission-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="totalCommission">$0.00</div>
+                        <div class="stat-label">Total Commission</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="totalReferrals">0</div>
+                        <div class="stat-label">Total Referrals</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Earning Methods Section -->
+            <div class="card">
+                <div class="card-title">Earning Methods</div>
+                <div class="earning-methods">
+                    <a href="watch.html" class="method">
+                        <div class="method-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="method-title">Watch Earn</div>
+                        <div class="method-desc">Watch ads & earn</div>
+                    </a>
+                    <a href="treasure.html" class="method">
+                        <div class="method-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <div class="method-title">Treasure Box</div>
+                        <div class="method-desc">Open daily treasure</div>
+                    </a>
+                    <a href="scratch.html" class="method">
+                        <div class="method-icon">
+                            <i class="fas fa-scroll"></i>
+                        </div>
+                        <div class="method-title">Scratch Cards</div>
+                        <div class="method-desc">Scratch & win</div>
+                    </a>
+                    <a href="tasks.html" class="method">
+                        <div class="method-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="method-title">Complete Tasks</div>
+                        <div class="method-desc">Earn by doing tasks</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Top 10 Lucky Winners Section -->
+            <div class="card winners-card">
+                <div class="card-title">Today's Lucky Winners</div>
+                <div class="winner-list" id="winnersList">
+                    <!-- Winners will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Recent Activity Section -->
+            <div class="card">
+                <div class="card-title">Recent Activity</div>
+                <div class="activity-list" id="recentActivity">
+                    <!-- Activities will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="dashboard.html" class="nav-item active">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <span>Home</span>
+            </a>
+            <a href="referral.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-users"></i></div>
+                <span>Referral</span>
+            </a>
+            <a href="luckydraw.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-gift"></i></div>
+                <span>Lucky Draw</span>
+            </a>
+            <a href="leaderboard.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-trophy"></i></div>
+                <span>Leaderboard</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <script type="module" src="assets/supabaseClient.js"></script>
+    <script type="module" src="assets/dashboard.js"></script>
+</body>
+</html>
