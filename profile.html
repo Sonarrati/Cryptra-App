@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Cryptra</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <div class="app-title">Cryptra</div>
+            <div class="notification-icon">
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="notification-badge">3</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- User Profile -->
+            <div class="card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h3 id="userName">Loading...</h3>
+                        <p id="userEmail">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Stats -->
+            <div class="card">
+                <div class="card-title">Account Statistics</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalEarnings">$0.00</div>
+                        <div class="stat-label">Total Earnings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="currentBalance">$0.00</div>
+                        <div class="stat-label">Current Balance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalReferrals">0</div>
+                        <div class="stat-label">Total Referrals</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="card">
+                <div class="card-title">Settings</div>
+                <div class="settings-list">
+                    <a href="#" class="setting-item">
+                        <i class="fas fa-user-edit"></i>
+                        <span>Edit Profile</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="#" class="setting-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Privacy Policy</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="#" class="setting-item">
+                        <i class="fas fa-question-circle"></i>
+                        <span>FAQ</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="#" class="setting-item">
+                        <i class="fas fa-headset"></i>
+                        <span>Support</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Logout -->
+            <div class="card">
+                <button class="btn btn-danger btn-full" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <span>Home</span>
+            </a>
+            <a href="referral.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-users"></i></div>
+                <span>Referral</span>
+            </a>
+            <a href="luckydraw.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-gift"></i></div>
+                <span>Lucky Draw</span>
+            </a>
+            <a href="leaderboard.html" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-trophy"></i></div>
+                <span>Leaderboard</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <script type="module" src="assets/supabaseClient.js"></script>
+    <script type="module" src="assets/profile.js"></script>
+</body>
+</html>
