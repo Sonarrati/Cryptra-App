@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Cryptra</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <div class="app-title">Cryptra Admin</div>
+            <div class="admin-logout">
+                <button class="btn btn-outline" id="adminLogout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Admin Tabs -->
+            <div class="card">
+                <div class="admin-tabs">
+                    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+                    <button class="tab-btn" data-tab="tasks">Tasks</button>
+                    <button class="tab-btn" data-tab="marketplace">Marketplace</button>
+                    <button class="tab-btn" data-tab="withdrawals">Withdrawals</button>
+                    <button class="tab-btn" data-tab="settings">Settings</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboardTab" class="admin-tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalEarnings">$0.00</div>
+                        <div class="stat-label">Platform Earnings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pendingWithdrawals">0</div>
+                        <div class="stat-label">Pending Withdrawals</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Recent Activity</div>
+                    <div class="activity-list" id="adminActivity">
+                        <!-- Activity will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Tab -->
+            <div id="tasksTab" class="admin-tab-content">
+                <div class="card">
+                    <div class="card-title">Manage Tasks</div>
+                    <button class="btn btn-primary" id="addTaskBtn">
+                        <i class="fas fa-plus"></i> Add New Task
+                    </button>
+                    <div class="tasks-list" id="adminTasksList">
+                        <!-- Tasks will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketplace Tab -->
+            <div id="marketplaceTab" class="admin-tab-content">
+                <div class="card">
+                    <div class="card-title">Manage Products</div>
+                    <button class="btn btn-primary" id="addProductBtn">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </button>
+                    <div class="marketplace-grid" id="adminProductsList">
+                        <!-- Products will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Withdrawals Tab -->
+            <div id="withdrawalsTab" class="admin-tab-content">
+                <div class="card">
+                    <div class="card-title">Pending Withdrawals</div>
+                    <div class="withdrawal-list" id="pendingWithdrawalsList">
+                        <!-- Withdrawals will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settingsTab" class="admin-tab-content">
+                <div class="card">
+                    <div class="card-title">Platform Settings</div>
+                    <form id="adminSettingsForm">
+                        <div class="form-group">
+                            <label>Signup Bonus ($)</label>
+                            <input type="number" id="signupBonus" step="0.001" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Referral Bonus ($)</label>
+                            <input type="number" id="referralBonus" step="0.001" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Withdrawal Minimum ($)</label>
+                            <input type="number" id="withdrawMin" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Withdrawal Maximum ($)</label>
+                            <input type="number" id="withdrawMax" step="0.01" min="0">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="assets/supabaseClient.js"></script>
+    <script type="module" src="assets/admin.js"></script>
+</body>
+</html>
