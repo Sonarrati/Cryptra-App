@@ -66,22 +66,60 @@
     </section>
 
     <script>
-        // ✅ Referral parameter handling for homepage
+        // ✅ Enhanced Referral Parameter Handling for GitHub Pages
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏠 Homepage loaded');
+            
             const urlParams = new URLSearchParams(window.location.search);
             const referralCode = urlParams.get('ref');
             
             if (referralCode) {
-                console.log('🔗 Referral code detected in homepage:', referralCode);
+                console.log('🔗 Referral code detected in URL:', referralCode);
                 
                 // Add referral code to signup link
                 const signupLink = document.getElementById('start-earning');
-                signupLink.href = `signup.html?ref=${referralCode}`;
+                if (signupLink) {
+                    signupLink.href = `signup.html?ref=${referralCode}`;
+                    console.log('✅ Updated signup link with referral code:', signupLink.href);
+                }
                 
-                // Show notification
+                // Show welcome message with referral bonus
                 setTimeout(() => {
-                    alert(`🎉 Welcome! You were referred by someone. Use their code to get 250 bonus coins!`);
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-3 rounded-2xl shadow-lg';
+                    notification.innerHTML = `
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-gift"></i>
+                            <span>🎉 Welcome! Use referral code <strong>${referralCode}</strong> to get 250 bonus coins!</span>
+                        </div>
+                    `;
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 5000);
                 }, 1000);
+            } else {
+                console.log('ℹ️ No referral code detected in URL');
+            }
+        });
+
+        // ✅ Handle page navigation and preserve referral parameters
+        window.addEventListener('load', function() {
+            // Preserve referral parameters in all navigation
+            const urlParams = new URLSearchParams(window.location.search);
+            const referralCode = urlParams.get('ref');
+            
+            if (referralCode) {
+                // Update all internal links to preserve referral code
+                document.querySelectorAll('a[href]').forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href && !href.includes('://') && !href.startsWith('#')) {
+                        // Add referral parameter to internal links
+                        const separator = href.includes('?') ? '&' : '?';
+                        link.href = href + separator + 'ref=' + referralCode;
+                    }
+                });
             }
         });
     </script>
