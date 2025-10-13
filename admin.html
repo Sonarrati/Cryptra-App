@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="google-adsense-account" content="ca-pub-3409420643457036">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Earnzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .premium-card { 
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .status-pending { color: #fbbf24; }
+        .status-paid { color: #10b981; }
+        .status-rejected { color: #ef4444; }
+        .flutter-card {
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .flutter-button {
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+        }
+        .flutter-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .flutter-input {
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .flutter-input:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen pb-20">
+    <!-- Header -->
+    <header class="bg-white/10 backdrop-blur-lg border-b border-white/20">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <a href="dashboard.html" class="text-white">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Admin Panel</h1>
+                        <p class="text-gray-200 text-sm">Manage users and withdrawals</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-yellow-300 font-bold text-lg" id="pendingCount">0</div>
+                    <div class="text-gray-300 text-sm">Pending</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Admin Tabs -->
+    <section class="p-4">
+        <div class="container mx-auto">
+            <!-- Tab Navigation -->
+            <div class="flex space-x-2 mb-6 bg-white/10 rounded-2xl p-1">
+                <button 
+                    onclick="showTab('withdrawals')"
+                    class="flex-1 py-3 rounded-2xl font-semibold transition-all duration-200 tab-button active flutter-button"
+                    data-tab="withdrawals"
+                >
+                    Withdrawals
+                </button>
+                <button 
+                    onclick="showTab('users')"
+                    class="flex-1 py-3 rounded-2xl font-semibold transition-all duration-200 tab-button flutter-button"
+                    data-tab="users"
+                >
+                    Users
+                </button>
+                <button 
+                    onclick="showTab('coins')"
+                    class="flex-1 py-3 rounded-2xl font-semibold transition-all duration-200 tab-button flutter-button"
+                    data-tab="coins"
+                >
+                    Coin Management
+                </button>
+            </div>
+
+            <!-- Withdrawals Tab -->
+            <div id="withdrawalsTab" class="tab-content">
+                <div class="premium-card rounded-3xl p-6 text-white mb-6 flutter-card">
+                    <h2 class="text-2xl font-bold mb-4">Pending Withdrawals</h2>
+                    <div id="pendingWithdrawals" class="space-y-4">
+                        <div class="text-center py-8">
+                            <i class="fas fa-check-circle text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-400">No pending withdrawals</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="premium-card rounded-3xl p-6 text-white flutter-card">
+                    <h2 class="text-2xl font-bold mb-4">Withdrawal History</h2>
+                    <div id="withdrawalHistory" class="space-y-3">
+                        <div class="text-center py-8">
+                            <i class="fas fa-history text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-400">No withdrawal history</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="usersTab" class="tab-content hidden">
+                <div class="premium-card rounded-3xl p-6 text-white flutter-card">
+                    <h2 class="text-2xl font-bold mb-4">All Users</h2>
+                    <div class="mb-4">
+                        <input 
+                            type="text" 
+                            id="userSearch"
+                            class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-input"
+                            placeholder="Search users by email or name..."
+                            oninput="searchUsers()"
+                        >
+                    </div>
+                    <div id="usersList" class="space-y-3">
+                        <div class="text-center py-8">
+                            <i class="fas fa-users text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-400">Loading users...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coin Management Tab -->
+            <div id="coinsTab" class="tab-content hidden">
+                <div class="premium-card rounded-3xl p-6 text-white flutter-card">
+                    <h2 class="text-2xl font-bold mb-4">Coin Management</h2>
+                    
+                    <!-- Add/Remove Coins Form -->
+                    <div class="bg-white/20 rounded-2xl p-4 mb-6">
+                        <h3 class="text-lg font-semibold mb-4">Adjust User Coins</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Select User</label>
+                                <select 
+                                    id="userSelect"
+                                    class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-input"
+                                >
+                                    <option value="">Select a user...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Action</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button 
+                                        onclick="setAction('add')"
+                                        class="action-btn bg-green-500 text-white py-3 rounded-2xl font-semibold hover:bg-green-600 transition-all duration-200 flutter-button"
+                                        data-action="add"
+                                    >
+                                        Add Coins
+                                    </button>
+                                    <button 
+                                        onclick="setAction('remove')"
+                                        class="action-btn bg-red-500 text-white py-3 rounded-2xl font-semibold hover:bg-red-600 transition-all duration-200 flutter-button"
+                                        data-action="remove"
+                                    >
+                                        Remove Coins
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Amount</label>
+                                <input 
+                                    type="number" 
+                                    id="coinAmount"
+                                    class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-input"
+                                    placeholder="Enter coin amount"
+                                    min="1"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Reason</label>
+                                <input 
+                                    type="text" 
+                                    id="coinReason"
+                                    class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-input"
+                                    placeholder="Reason for adjustment"
+                                >
+                            </div>
+                            <button 
+                                onclick="adjustCoins()"
+                                class="w-full bg-yellow-400 text-gray-800 py-4 rounded-2xl font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flutter-button"
+                                id="adjustButton"
+                                disabled
+                            >
+                                Process Adjustment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-lg border-t border-white/20">
+        <div class="container mx-auto px-4 py-3">
+            <div class="grid grid-cols-4 gap-4">
+                <a href="dashboard.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-home text-xl mb-1"></i>
+                    <div class="text-xs">Home</div>
+                </a>
+                <a href="watch.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-coins text-xl mb-1"></i>
+                    <div class="text-xs">Earn</div>
+                </a>
+                <a href="withdraw.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-wallet text-xl mb-1"></i>
+                    <div class="text-xs">Wallet</div>
+                </a>
+                <a href="profile.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-user text-xl mb-1"></i>
+                    <div class="text-xs">Profile</div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase - UPDATED
+        const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let selectedAction = null;
+        let allUsers = [];
+
+        // Basic admin check (in production, use proper role-based authentication)
+        const ADMIN_EMAILS = ['admin@earnzy.com', 'test@example.com'];
+
+        async function loadAdminPage() {
+            try {
+                // Check authentication
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = session.user;
+
+                // Check if user is admin
+                if (!ADMIN_EMAILS.includes(currentUser.email)) {
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+
+                await loadWithdrawals();
+                await loadUsers();
+                await loadUserSelect();
+
+            } catch (error) {
+                console.error('Admin page load error:', error);
+                window.location.href = 'dashboard.html';
+            }
+        }
+
+        async function loadWithdrawals() {
+            try {
+                // Load pending withdrawals
+                const { data: pending, error: pendingError } = await supabase
+                    .from('withdrawals')
+                    .select(`
+                        *,
+                        user:users!withdrawals_user_id_fkey (name, email)
+                    `)
+                    .eq('status', 'pending')
+                    .order('created_at', { ascending: true });
+
+                if (pendingError) throw pendingError;
+
+                // Load withdrawal history
+                const { data: history, error: historyError } = await supabase
+                    .from('withdrawals')
+                    .select(`
+                        *,
+                        user:users!withdrawals_user_id_fkey (name, email)
+                    `)
+                    .neq('status', 'pending')
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+
+                if (historyError) throw historyError;
+
+                // Update pending count
+                document.getElementById('pendingCount').textContent = pending?.length || 0;
+
+                // Display pending withdrawals
+                const pendingContainer = document.getElementById('pendingWithdrawals');
+                if (pending && pending.length > 0) {
+                    pendingContainer.innerHTML = pending.map(withdrawal => `
+                        <div class="bg-white/10 rounded-2xl p-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <div class="font-semibold">${withdrawal.user.name || withdrawal.user.email}</div>
+                                    <div class="text-sm text-gray-300">${withdrawal.user.email}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-yellow-300 font-bold text-lg">${withdrawal.coins_requested} coins</div>
+                                    <div class="text-sm status-pending">Pending</div>
+                                </div>
+                            </div>
+                            <div class="text-sm mb-3">
+                                <div><strong>Method:</strong> ${withdrawal.method}</div>
+                                <div><strong>Account:</strong> ${withdrawal.account}</div>
+                                <div><strong>Net Amount:</strong> ${withdrawal.net_amount} coins</div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button 
+                                    onclick="updateWithdrawal('${withdrawal.id}', 'paid')"
+                                    class="flex-1 bg-green-500 text-white py-2 rounded-2xl font-semibold hover:bg-green-600 transition-all duration-200 flutter-button"
+                                >
+                                    Approve
+                                </button>
+                                <button 
+                                    onclick="updateWithdrawal('${withdrawal.id}', 'rejected')"
+                                    class="flex-1 bg-red-500 text-white py-2 rounded-2xl font-semibold hover:bg-red-600 transition-all duration-200 flutter-button"
+                                >
+                                    Reject
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    pendingContainer.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-check-circle text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-400">No pending withdrawals</p>
+                        </div>
+                    `;
+                }
+
+                // Display withdrawal history
+                const historyContainer = document.getElementById('withdrawalHistory');
+                if (history && history.length > 0) {
+                    historyContainer.innerHTML = history.map(withdrawal => {
+                        const statusClass = `status-${withdrawal.status}`;
+                        return `
+                            <div class="flex justify-between items-center py-3 border-b border-white/10 last:border-b-0">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-wallet text-yellow-400"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold">${withdrawal.user.name || withdrawal.user.email}</div>
+                                        <div class="text-xs text-gray-300">${withdrawal.method} • ${new Date(withdrawal.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold">${withdrawal.coins_requested} coins</div>
+                                    <div class="text-xs ${statusClass} capitalize">${withdrawal.status}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+            } catch (error) {
+                console.error('Error loading withdrawals:', error);
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(100);
+
+                if (error) throw error;
+
+                allUsers = data || [];
+                displayUsers(allUsers);
+
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        async function loadUserSelect() {
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('id, email, name')
+                    .order('email', { ascending: true });
+
+                if (error) throw error;
+
+                const select = document.getElementById('userSelect');
+                select.innerHTML = '<option value="">Select a user...</option>' +
+                    data.map(user => `
+                        <option value="${user.id}">${user.name || user.email} (${user.email})</option>
+                    `).join('');
+
+            } catch (error) {
+                console.error('Error loading user select:', error);
+            }
+        }
+
+        function displayUsers(users) {
+            const container = document.getElementById('usersList');
+            
+            if (users && users.length > 0) {
+                container.innerHTML = users.map(user => `
+                    <div class="flex justify-between items-center py-3 border-b border-white/10 last:border-b-0">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-gray-800"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">${user.name || 'No Name'}</div>
+                                <div class="text-xs text-gray-300">${user.email}</div>
+                                <div class="text-xs text-blue-300">Streak: ${user.daily_streak || 0} days</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-yellow-300 font-bold">${user.total_coins || 0}</div>
+                            <div class="text-xs text-gray-300">coins</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function searchUsers() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            const filteredUsers = allUsers.filter(user => 
+                user.email.toLowerCase().includes(searchTerm) || 
+                (user.name && user.name.toLowerCase().includes(searchTerm))
+            );
+            displayUsers(filteredUsers);
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'bg-yellow-400', 'text-gray-800');
+                btn.classList.add('text-white');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+            
+            // Activate selected button
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active', 'bg-yellow-400', 'text-gray-800');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.remove('text-white');
+        }
+
+        async function updateWithdrawal(withdrawalId, status) {
+            try {
+                const { error } = await supabase
+                    .from('withdrawals')
+                    .update({ status: status })
+                    .eq('id', withdrawalId);
+
+                if (error) throw error;
+
+                showNotification(`Withdrawal ${status} successfully`, 'success');
+                await loadWithdrawals();
+
+            } catch (error) {
+                console.error('Error updating withdrawal:', error);
+                showNotification('Failed to update withdrawal', 'error');
+            }
+        }
+
+        function setAction(action) {
+            selectedAction = action;
+            
+            // Update button styles
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-yellow-400');
+            });
+            document.querySelector(`[data-action="${action}"]`).classList.add('ring-2', 'ring-yellow-400');
+            
+            validateAdjustment();
+        }
+
+        function validateAdjustment() {
+            const userId = document.getElementById('userSelect').value;
+            const amount = document.getElementById('coinAmount').value;
+            const reason = document.getElementById('coinReason').value;
+            const button = document.getElementById('adjustButton');
+            
+            if (userId && selectedAction && amount && reason) {
+                button.disabled = false;
+            } else {
+                button.disabled = true;
+            }
+        }
+
+        async function adjustCoins() {
+            try {
+                const userId = document.getElementById('userSelect').value;
+                const amount = parseInt(document.getElementById('coinAmount').value);
+                const reason = document.getElementById('coinReason').value;
+
+                if (!userId || !selectedAction || !amount || !reason) {
+                    showNotification('Please fill all fields', 'error');
+                    return;
+                }
+
+                // Get current user data
+                const { data: user, error: userError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (userError) throw userError;
+
+                let newTotalCoins = user.total_coins || 0;
+                let newEarnedCoins = user.earned_coins || 0;
+
+                if (selectedAction === 'add') {
+                    newTotalCoins += amount;
+                    newEarnedCoins += amount;
+                } else if (selectedAction === 'remove') {
+                    if (amount > newTotalCoins) {
+                        showNotification('Cannot remove more coins than user has', 'error');
+                        return;
+                    }
+                    newTotalCoins -= amount;
+                }
+
+                // Update user coins
+                const { error: updateError } = await supabase
+                    .from('users')
+                    .update({
+                        total_coins: newTotalCoins,
+                        earned_coins: newEarnedCoins
+                    })
+                    .eq('id', userId);
+
+                if (updateError) throw updateError;
+
+                // Add earning record for tracking
+                const { error: earningError } = await supabase
+                    .from('earnings')
+                    .insert({
+                        user_id: userId,
+                        type: 'admin_adjustment',
+                        coins: selectedAction === 'add' ? amount : -amount,
+                        description: reason
+                    });
+
+                if (earningError) throw earningError;
+
+                showNotification(`Successfully ${selectedAction === 'add' ? 'added' : 'removed'} ${amount} coins`, 'success');
+
+                // Reset form
+                document.getElementById('coinAmount').value = '';
+                document.getElementById('coinReason').value = '';
+                document.querySelectorAll('.action-btn').forEach(btn => {
+                    btn.classList.remove('ring-2', 'ring-yellow-400');
+                });
+                selectedAction = null;
+                document.getElementById('adjustButton').disabled = true;
+
+                // Reload data
+                await loadUsers();
+
+            } catch (error) {
+                console.error('Error adjusting coins:', error);
+                showNotification('Failed to adjust coins', 'error');
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.classList.remove('hidden');
+
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Add event listeners for real-time validation
+        document.getElementById('userSelect').addEventListener('change', validateAdjustment);
+        document.getElementById('coinAmount').addEventListener('input', validateAdjustment);
+        document.getElementById('coinReason').addEventListener('input', validateAdjustment);
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', loadAdminPage);
+    </script>
+</body>
+</html>
