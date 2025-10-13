@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="google-adsense-account" content="ca-pub-3409420643457036">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Ads - Earnzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .premium-card { 
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        #adDisplay {
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            border-radius: 16px;
+        }
+        .countdown-timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+        .flutter-card {
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .flutter-button {
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+        }
+        .flutter-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen pb-20">
+    <!-- Header -->
+    <header class="bg-white/10 backdrop-blur-lg border-b border-white/20">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <a href="dashboard.html" class="text-white">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Watch Ads</h1>
+                        <p class="text-gray-200 text-sm">Earn 10-20 coins per ad</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-yellow-300 font-bold text-lg" id="todayEarnings">0</div>
+                    <div class="text-gray-300 text-sm">Today</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Ad Container -->
+    <section class="p-4">
+        <div class="container mx-auto">
+            <div class="premium-card rounded-3xl p-6 text-white mb-6 text-center flutter-card">
+                <div class="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-tv text-3xl text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Watch & Earn</h2>
+                <p class="text-gray-300 mb-4">Watch short ads and earn coins instantly</p>
+                <div class="bg-white/20 rounded-2xl p-4 mb-6">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Coins per ad:</span>
+                        <span class="text-yellow-300">10-20 coins</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Daily limit:</span>
+                        <span>50 ads</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span>Watched today:</span>
+                        <span id="watchedToday">0/50</span>
+                    </div>
+                </div>
+
+                <!-- Ad Simulation -->
+                <div id="adContainer" class="mb-6">
+                    <div id="adDisplay" class="rounded-2xl p-4 aspect-video flex items-center justify-center mb-4">
+                        <div class="text-center" id="initialAdState">
+                            <i class="fas fa-play-circle text-4xl text-white mb-2"></i>
+                            <p class="text-white">Ad will play here</p>
+                        </div>
+                        <div id="activeAdState" class="hidden w-full h-full">
+                            <!-- Ad will be loaded here -->
+                        </div>
+                        <div id="countdownState" class="hidden text-center">
+                            <div class="countdown-timer" id="countdown">15</div>
+                            <p class="text-white mt-2">Please watch the ad to earn coins</p>
+                        </div>
+                    </div>
+                    <button 
+                        onclick="startAd()"
+                        id="watchButton"
+                        class="w-full bg-yellow-400 text-gray-800 py-4 rounded-2xl font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flutter-button"
+                    >
+                        Watch Ad & Earn Coins
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="hidden text-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
+                    <p class="text-lg font-semibold">Loading ad...</p>
+                    <p class="text-gray-300 text-sm">Please wait a moment</p>
+                </div>
+
+                <!-- Result State -->
+                <div id="resultState" class="hidden text-center">
+                    <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Congratulations!</h3>
+                    <p class="text-gray-300 mb-4">You earned <span id="earnedCoins" class="text-yellow-300 font-bold">0</span> coins</p>
+                    <p class="text-sm text-green-300 mb-4" id="commissionInfo"></p>
+                    <button 
+                        onclick="resetAd()"
+                        class="w-full bg-yellow-400 text-gray-800 py-4 rounded-2xl font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 flutter-button"
+                    >
+                        Watch Another Ad
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Earnings -->
+            <div class="premium-card rounded-3xl p-6 text-white flutter-card">
+                <h3 class="text-lg font-bold mb-4">Recent Earnings</h3>
+                <div id="recentEarnings" class="space-y-3">
+                    <div class="text-center py-8">
+                        <i class="fas fa-history text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-400">No recent earnings</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-lg border-t border-white/20">
+        <div class="container mx-auto px-4 py-3">
+            <div class="grid grid-cols-4 gap-4">
+                <a href="dashboard.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-home text-xl mb-1"></i>
+                    <div class="text-xs">Home</div>
+                </a>
+                <a href="watch.html" class="text-center text-yellow-400">
+                    <i class="fas fa-coins text-xl mb-1"></i>
+                    <div class="text-xs font-semibold">Earn</div>
+                </a>
+                <a href="withdraw.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-wallet text-xl mb-1"></i>
+                    <div class="text-xs">Wallet</div>
+                </a>
+                <a href="profile.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-user text-xl mb-1"></i>
+                    <div class="text-xs">Profile</div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase - UPDATED
+        const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let todayEarnings = [];
+        let countdownInterval = null;
+        let currentAdElement = null;
+
+        async function loadWatchPage() {
+            try {
+                // Check authentication
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = session.user;
+                await loadTodayEarnings();
+                await loadRecentEarnings();
+
+            } catch (error) {
+                console.error('Watch page load error:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function loadTodayEarnings() {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                
+                const { data, error } = await supabase
+                    .from('earnings')
+                    .select('coins')
+                    .eq('user_id', currentUser.id)
+                    .eq('type', 'watch')
+                    .gte('created_at', today + 'T00:00:00')
+                    .lte('created_at', today + 'T23:59:59');
+
+                if (error) throw error;
+
+                todayEarnings = data || [];
+                const totalToday = todayEarnings.reduce((sum, earning) => sum + earning.coins, 0);
+                const watchedToday = todayEarnings.length;
+
+                document.getElementById('todayEarnings').textContent = totalToday;
+                document.getElementById('watchedToday').textContent = `${watchedToday}/50`;
+
+                // Disable button if limit reached
+                if (watchedToday >= 50) {
+                    document.getElementById('watchButton').disabled = true;
+                    document.getElementById('watchButton').textContent = 'Daily Limit Reached';
+                }
+
+            } catch (error) {
+                console.error('Error loading today earnings:', error);
+            }
+        }
+
+        async function loadRecentEarnings() {
+            try {
+                const { data, error } = await supabase
+                    .from('earnings')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('type', 'watch')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                const container = document.getElementById('recentEarnings');
+                
+                if (data && data.length > 0) {
+                    container.innerHTML = data.map(earning => `
+                        <div class="flex justify-between items-center py-2 border-b border-white/10 last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                                    <i class="fas fa-tv text-yellow-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Watch Ad</div>
+                                    <div class="text-xs text-gray-300">${new Date(earning.created_at).toLocaleTimeString()}</div>
+                                </div>
+                            </div>
+                            <div class="text-green-400 font-bold">+${earning.coins}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading recent earnings:', error);
+            }
+        }
+
+        function startAd() {
+            try {
+                // Show loading state
+                document.getElementById('watchButton').disabled = true;
+                document.getElementById('loadingState').classList.remove('hidden');
+                document.getElementById('adContainer').classList.add('hidden');
+
+                // Check daily limit
+                if (todayEarnings.length >= 50) {
+                    throw new Error('Daily limit reached');
+                }
+
+                // Load ad after a short delay
+                setTimeout(() => {
+                    loadAd();
+                }, 1000);
+
+            } catch (error) {
+                console.error('Start ad error:', error);
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('adContainer').classList.remove('hidden');
+                document.getElementById('watchButton').disabled = false;
+                showNotification(error.message || 'Failed to load ad', 'error');
+            }
+        }
+
+        function loadAd() {
+            try {
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('adContainer').classList.remove('hidden');
+                
+                // Hide initial state and show ad container
+                document.getElementById('initialAdState').classList.add('hidden');
+                document.getElementById('activeAdState').classList.remove('hidden');
+                document.getElementById('countdownState').classList.remove('hidden');
+
+                // Load the ad code
+                const activeAdState = document.getElementById('activeAdState');
+                activeAdState.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl">
+                        <div class="text-center text-white">
+                            <i class="fas fa-ad text-4xl mb-4"></i>
+                            <h3 class="text-xl font-bold mb-2">Advertisement</h3>
+                            <p class="text-sm">This is a sample advertisement</p>
+                            <p class="text-xs mt-2 text-yellow-300">Please wait for the countdown</p>
+                        </div>
+                    </div>
+                `;
+
+                // Start countdown
+                startCountdown();
+
+            } catch (error) {
+                console.error('Load ad error:', error);
+                resetAd();
+                showNotification('Failed to load advertisement', 'error');
+            }
+        }
+
+        function startCountdown() {
+            let seconds = 15;
+            const countdownElement = document.getElementById('countdown');
+            countdownElement.textContent = seconds;
+
+            countdownInterval = setInterval(() => {
+                seconds--;
+                countdownElement.textContent = seconds;
+
+                if (seconds <= 0) {
+                    clearInterval(countdownInterval);
+                    processAdCompletion();
+                }
+            }, 1000);
+        }
+
+        async function processAdCompletion() {
+            try {
+                // Hide ad and show loading
+                document.getElementById('activeAdState').classList.add('hidden');
+                document.getElementById('countdownState').classList.add('hidden');
+                document.getElementById('loadingState').classList.remove('hidden');
+
+                // Process ad reward
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) throw new Error('Not authenticated');
+
+                // Generate random coins between 10-20
+                const coins = Math.floor(Math.random() * 11) + 10;
+
+                // Update coins in database
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (userError) throw userError;
+
+                const { error: updateError } = await supabase
+                    .from('users')
+                    .update({
+                        total_coins: userData.total_coins + coins,
+                        earned_coins: userData.earned_coins + coins
+                    })
+                    .eq('id', user.id);
+
+                if (updateError) throw updateError;
+
+                // Add earning record
+                const { error: earningError } = await supabase
+                    .from('earnings')
+                    .insert({
+                        user_id: user.id,
+                        type: 'watch',
+                        coins: coins
+                    });
+
+                if (earningError) throw earningError;
+
+                // Show result
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('resultState').classList.remove('hidden');
+                document.getElementById('earnedCoins').textContent = coins;
+
+                // Show commission info
+                document.getElementById('commissionInfo').innerHTML = `
+                    <i class="fas fa-users mr-1"></i>
+                    Your network will earn commissions from 7 levels!
+                `;
+
+                // Reload data
+                await loadTodayEarnings();
+                await loadRecentEarnings();
+
+                showNotification(`+${coins} coins earned!`, 'success');
+
+            } catch (error) {
+                console.error('Process ad completion error:', error);
+                document.getElementById('loadingState').classList.add('hidden');
+                resetAd();
+                showNotification(error.message || 'Failed to process ad', 'error');
+            }
+        }
+
+        function resetAd() {
+            // Clear any existing intervals
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+
+            // Reset all states
+            document.getElementById('resultState').classList.add('hidden');
+            document.getElementById('activeAdState').classList.add('hidden');
+            document.getElementById('countdownState').classList.add('hidden');
+            document.getElementById('initialAdState').classList.remove('hidden');
+            document.getElementById('adContainer').classList.remove('hidden');
+            
+            // Clear ad content
+            document.getElementById('activeAdState').innerHTML = '';
+            
+            // Re-enable watch button if limit not reached
+            if (todayEarnings.length < 50) {
+                document.getElementById('watchButton').disabled = false;
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.classList.remove('hidden');
+
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', loadWatchPage);
+    </script>
+</body>
+</html>
