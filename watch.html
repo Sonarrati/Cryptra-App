@@ -118,7 +118,7 @@
                 <!-- Loading State -->
                 <div id="loadingState" class="hidden text-center">
                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-                    <p class="text-lg font-semibold">Loading ad...</p>
+                    <p class="text-lg font-semibold">Processing...</p>
                     <p class="text-gray-300 text-sm">Please wait a moment</p>
                 </div>
 
@@ -181,31 +181,154 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Initialize Supabase - UPDATED
+        // Initialize Supabase
         const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         let currentUser = null;
         let todayEarnings = [];
         let countdownInterval = null;
-        let currentAdElement = null;
 
+        // Enhanced wallet functions - ADDED HERE
+        async function updateCoins(userId, coinChange, type = 'earn', earningType = null) {
+            try {
+                console.log(`🪙 Updating coins: User ${userId}, Change: ${coinChange}, Type: ${type}, EarningType: ${earningType}`);
+
+                // Get current user data
+                const { data: user, error: userError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (userError) {
+                    console.error('❌ User fetch error:', userError);
+                    throw userError;
+                }
+
+                console.log('📊 Current user data:', user);
+
+                let updateData = {};
+                
+                if (type === 'earn') {
+                    updateData = {
+                        total_coins: parseInt(user.total_coins || 0) + parseInt(coinChange),
+                        earned_coins: parseInt(user.earned_coins || 0) + parseInt(coinChange),
+                        updated_at: new Date().toISOString()
+                    };
+                } else if (type === 'withdraw') {
+                    updateData = {
+                        total_coins: parseInt(user.total_coins || 0) - parseInt(coinChange),
+                        withdrawn_coins: parseInt(user.withdrawn_coins || 0) + parseInt(coinChange),
+                        updated_at: new Date().toISOString()
+                    };
+                }
+
+                console.log('🔄 Update data:', updateData);
+
+                // Update user coins
+                const { error: updateError } = await supabase
+                    .from('users')
+                    .update(updateData)
+                    .eq('id', userId);
+
+                if (updateError) {
+                    console.error('❌ Coin update error:', updateError);
+                    throw updateError;
+                }
+
+                console.log('✅ Coins updated successfully');
+
+                // Add earning record
+                if (type === 'earn' && earningType) {
+                    await addEarningRecord(userId, earningType, coinChange);
+                }
+
+                return true;
+            } catch (error) {
+                console.error('❌ Error updating coins:', error);
+                return false;
+            }
+        }
+
+        async function addEarningRecord(userId, type, coins, level = null) {
+            try {
+                console.log('📝 Adding earning record:', { userId, type, coins, level });
+
+                const record = {
+                    user_id: userId,
+                    type: type,
+                    coins: parseInt(coins)
+                };
+
+                if (level !== null) {
+                    record.level = level;
+                }
+
+                const { error } = await supabase
+                    .from('earnings')
+                    .insert(record);
+
+                if (error) {
+                    console.error('❌ Earning record error:', error);
+                    throw error;
+                }
+
+                console.log('✅ Earning record added successfully');
+                return true;
+            } catch (error) {
+                console.error('❌ Error adding earning record:', error);
+                return false;
+            }
+        }
+
+        async function checkDailyLimit(userId, activityType) {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                
+                const { data, error } = await supabase
+                    .from('earnings')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .eq('type', activityType)
+                    .gte('created_at', today + 'T00:00:00')
+                    .lte('created_at', today + 'T23:59:59');
+
+                if (error) {
+                    console.error('❌ Daily limit check error:', error);
+                    throw error;
+                }
+
+                console.log(`📅 Daily ${activityType} count:`, data?.length || 0);
+                return data || [];
+            } catch (error) {
+                console.error('❌ Error checking daily limit:', error);
+                return [];
+            }
+        }
+
+        // Main functions
         async function loadWatchPage() {
             try {
+                console.log('📺 Loading watch page...');
+                
                 // Check authentication
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) {
+                    console.log('❌ No session, redirecting to login');
                     window.location.href = 'login.html';
                     return;
                 }
 
                 currentUser = session.user;
+                console.log('✅ User authenticated:', currentUser.email);
+
                 await loadTodayEarnings();
                 await loadRecentEarnings();
 
             } catch (error) {
-                console.error('Watch page load error:', error);
+                console.error('❌ Watch page load error:', error);
                 window.location.href = 'login.html';
             }
         }
@@ -237,8 +360,10 @@
                     document.getElementById('watchButton').textContent = 'Daily Limit Reached';
                 }
 
+                console.log(`📊 Today's watch earnings: ${totalToday} coins, ${watchedToday}/50 ads`);
+
             } catch (error) {
-                console.error('Error loading today earnings:', error);
+                console.error('❌ Error loading today earnings:', error);
             }
         }
 
@@ -271,23 +396,33 @@
                             <div class="text-green-400 font-bold">+${earning.coins}</div>
                         </div>
                     `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-history text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-400">No recent earnings</p>
+                        </div>
+                    `;
                 }
             } catch (error) {
-                console.error('Error loading recent earnings:', error);
+                console.error('❌ Error loading recent earnings:', error);
             }
         }
 
         function startAd() {
             try {
+                console.log('🎬 Starting ad...');
+                
+                // Check daily limit
+                if (todayEarnings.length >= 50) {
+                    showNotification('Daily limit reached (50 ads)', 'error');
+                    return;
+                }
+
                 // Show loading state
                 document.getElementById('watchButton').disabled = true;
                 document.getElementById('loadingState').classList.remove('hidden');
                 document.getElementById('adContainer').classList.add('hidden');
-
-                // Check daily limit
-                if (todayEarnings.length >= 50) {
-                    throw new Error('Daily limit reached');
-                }
 
                 // Load ad after a short delay
                 setTimeout(() => {
@@ -295,7 +430,7 @@
                 }, 1000);
 
             } catch (error) {
-                console.error('Start ad error:', error);
+                console.error('❌ Start ad error:', error);
                 document.getElementById('loadingState').classList.add('hidden');
                 document.getElementById('adContainer').classList.remove('hidden');
                 document.getElementById('watchButton').disabled = false;
@@ -305,6 +440,8 @@
 
         function loadAd() {
             try {
+                console.log('📺 Loading ad content...');
+                
                 document.getElementById('loadingState').classList.add('hidden');
                 document.getElementById('adContainer').classList.remove('hidden');
                 
@@ -330,7 +467,7 @@
                 startCountdown();
 
             } catch (error) {
-                console.error('Load ad error:', error);
+                console.error('❌ Load ad error:', error);
                 resetAd();
                 showNotification('Failed to load advertisement', 'error');
             }
@@ -354,47 +491,29 @@
 
         async function processAdCompletion() {
             try {
+                console.log('✅ Ad completed, processing reward...');
+                
                 // Hide ad and show loading
                 document.getElementById('activeAdState').classList.add('hidden');
                 document.getElementById('countdownState').classList.add('hidden');
                 document.getElementById('loadingState').classList.remove('hidden');
 
-                // Process ad reward
+                // Check authentication again
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) throw new Error('Not authenticated');
 
                 // Generate random coins between 10-20
                 const coins = Math.floor(Math.random() * 11) + 10;
+                console.log(`💰 Generated coins: ${coins}`);
 
-                // Update coins in database
-                const { data: userData, error: userError } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('id', user.id)
-                    .single();
+                // Update coins using our function
+                const coinUpdated = await updateCoins(user.id, coins, 'earn', 'watch');
+                
+                if (!coinUpdated) {
+                    throw new Error('Failed to update coins');
+                }
 
-                if (userError) throw userError;
-
-                const { error: updateError } = await supabase
-                    .from('users')
-                    .update({
-                        total_coins: userData.total_coins + coins,
-                        earned_coins: userData.earned_coins + coins
-                    })
-                    .eq('id', user.id);
-
-                if (updateError) throw updateError;
-
-                // Add earning record
-                const { error: earningError } = await supabase
-                    .from('earnings')
-                    .insert({
-                        user_id: user.id,
-                        type: 'watch',
-                        coins: coins
-                    });
-
-                if (earningError) throw earningError;
+                console.log('✅ Coins updated successfully');
 
                 // Show result
                 document.getElementById('loadingState').classList.add('hidden');
@@ -411,17 +530,19 @@
                 await loadTodayEarnings();
                 await loadRecentEarnings();
 
-                showNotification(`+${coins} coins earned!`, 'success');
+                showNotification(`🎉 +${coins} coins earned!`, 'success');
 
             } catch (error) {
-                console.error('Process ad completion error:', error);
+                console.error('❌ Process ad completion error:', error);
                 document.getElementById('loadingState').classList.add('hidden');
                 resetAd();
-                showNotification(error.message || 'Failed to process ad', 'error');
+                showNotification('Failed to process ad: ' + error.message, 'error');
             }
         }
 
         function resetAd() {
+            console.log('🔄 Resetting ad...');
+            
             // Clear any existing intervals
             if (countdownInterval) {
                 clearInterval(countdownInterval);
