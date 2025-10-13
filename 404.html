@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting...</title>
+    <script>
+        // Redirect to main page with referral parameters
+        const path = window.location.pathname + window.location.search + window.location.hash;
+        
+        if (path.includes('ref=')) {
+            // Preserve referral parameters
+            window.location.href = '/index.html' + window.location.search + window.location.hash;
+        } else {
+            window.location.href = '/index.html';
+        }
+    </script>
+</head>
+<body>
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h1>Redirecting to Earnzy...</h1>
+        <p>If you are not redirected automatically, <a href="/index.html">click here</a>.</p>
+    </div>
+</body>
+</html>
