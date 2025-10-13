@@ -155,7 +155,9 @@
             const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
             const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-            // ✅ REFERRAL PARAMETER HANDLING - ADD THIS
+            console.log('📝 Signup page loaded');
+
+            // ✅ ENHANCED: Referral Parameter Handling for GitHub Pages
             const urlParams = new URLSearchParams(window.location.search);
             const referralCodeFromUrl = urlParams.get('ref');
             
@@ -165,7 +167,19 @@
                 
                 // Show notification about referral bonus
                 setTimeout(() => {
-                    showNotification(`🎉 You'll get 250 bonus coins using referral code: ${referralCodeFromUrl}`, 'success');
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-500 text-gray-800 px-6 py-3 rounded-2xl shadow-lg';
+                    notification.innerHTML = `
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-gift"></i>
+                            <span>🎉 You'll get <strong>250 bonus coins</strong> using referral code: <strong>${referralCodeFromUrl}</strong></span>
+                        </div>
+                    `;
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 5000);
                 }, 1000);
             }
 
@@ -330,20 +344,6 @@
                     loading.classList.add('hidden');
                 }
             });
-
-            function showNotification(message, type) {
-                // Create notification element
-                const notification = document.createElement('div');
-                notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
-                    type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-                }`;
-                notification.textContent = message;
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    notification.remove();
-                }, 3000);
-            }
         });
     </script>
 </body>
