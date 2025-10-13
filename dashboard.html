@@ -21,10 +21,6 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .flutter-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        }
         .flutter-button {
             border-radius: 16px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -205,26 +201,28 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Initialize Supabase - UPDATED
+        // Initialize Supabase - FIXED
         const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+        // Enhanced dashboard loading - FIXED
         async function loadDashboard() {
             try {
-                // Show loading
+                console.log('🚀 Loading dashboard...');
                 document.getElementById('loadingOverlay').classList.remove('hidden');
 
-                // Check authentication
-                const { data: { session } } = await supabase.auth.getSession();
-                if (!session) {
+                // Enhanced authentication check
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                if (sessionError || !session) {
+                    console.log('❌ No session, redirecting to login');
                     window.location.href = 'login.html';
                     return;
                 }
 
-                console.log('Session found:', session.user.id);
+                console.log('✅ Session found:', session.user.id);
 
-                // Load user data with error handling
+                // Load user data with enhanced error handling
                 const { data: user, error } = await supabase
                     .from('users')
                     .select('*')
@@ -232,13 +230,15 @@
                     .single();
 
                 if (error) {
-                    console.error('Error loading user data:', error);
-                    throw error;
+                    console.error('❌ User data error:', error);
+                    // Create user profile if doesn't exist
+                    await createUserProfile(session.user);
+                    return;
                 }
 
-                console.log('User data loaded:', user);
+                console.log('✅ User data loaded:', user);
 
-                // Update UI with actual data
+                // Update UI with actual data - FIXED
                 document.getElementById('userName').textContent = user.name || user.email || 'User';
                 document.getElementById('totalCoins').textContent = user.total_coins || 0;
                 document.getElementById('earnedCoins').textContent = user.earned_coins || 0;
@@ -249,7 +249,7 @@
                 await loadRecentActivity(session.user.id);
 
             } catch (error) {
-                console.error('Dashboard load error:', error);
+                console.error('❌ Dashboard load error:', error);
                 
                 // Show error state but don't redirect
                 document.getElementById('userName').textContent = 'Error loading data';
@@ -269,13 +269,47 @@
                     </div>
                 `;
             } finally {
-                // Hide loading
                 document.getElementById('loadingOverlay').classList.add('hidden');
+            }
+        }
+
+        // Create user profile if doesn't exist - ADDED
+        async function createUserProfile(authUser) {
+            try {
+                console.log('👤 Creating user profile...');
+                const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                
+                const { error } = await supabase
+                    .from('users')
+                    .insert({
+                        id: authUser.id,
+                        email: authUser.email,
+                        name: authUser.user_metadata?.name || authUser.email.split('@')[0],
+                        referral_code: referralCode,
+                        total_coins: 0,
+                        earned_coins: 0,
+                        withdrawn_coins: 0,
+                        daily_streak: 0,
+                        last_checkin: null
+                    });
+
+                if (error) {
+                    console.error('❌ Profile creation error:', error);
+                    throw error;
+                }
+
+                console.log('✅ User profile created');
+                // Reload dashboard
+                await loadDashboard();
+                
+            } catch (error) {
+                console.error('❌ Failed to create user profile:', error);
             }
         }
 
         async function loadRecentActivity(userId) {
             try {
+                console.log('📊 Loading recent activity...');
                 const { data: earnings, error } = await supabase
                     .from('earnings')
                     .select('*')
@@ -322,7 +356,7 @@
                     `;
                 }
             } catch (error) {
-                console.error('Activity load error:', error);
+                console.error('❌ Activity load error:', error);
                 document.getElementById('recentActivity').innerHTML = `
                     <div class="text-center py-8 text-gray-400">
                         <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
@@ -354,7 +388,7 @@
                     window.location.href = 'login.html';
                 }
             } catch (error) {
-                console.error('Sign out error:', error);
+                console.error('❌ Sign out error:', error);
                 document.getElementById('loadingOverlay').classList.add('hidden');
             }
         }
@@ -366,8 +400,9 @@
             }
         });
 
-        // Initialize dashboard
+        // Initialize dashboard - FIXED
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏠 Dashboard initialized');
             loadDashboard();
             
             // Auto-refresh every 30 seconds
