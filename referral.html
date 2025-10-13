@@ -254,7 +254,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Initialize Supabase - UPDATED
+        // Initialize Supabase
         const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -263,44 +263,62 @@
 
         async function loadReferralPage() {
             try {
+                console.log('🔗 Loading referral page...');
+                
                 // Check authentication
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) {
+                    console.log('❌ No session, redirecting to login');
                     window.location.href = 'login.html';
                     return;
                 }
 
                 currentUser = session.user;
+                console.log('✅ User authenticated:', currentUser.email);
+
                 await loadUserData();
                 await loadReferralStats();
                 await loadReferralNetwork();
 
             } catch (error) {
-                console.error('Referral page load error:', error);
+                console.error('❌ Referral page load error:', error);
                 window.location.href = 'login.html';
             }
         }
 
         async function loadUserData() {
             try {
+                console.log('👤 Loading user data...');
+                
                 const { data, error } = await supabase
                     .from('users')
                     .select('*')
                     .eq('id', currentUser.id)
                     .single();
 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ User data error:', error);
+                    throw error;
+                }
 
+                // ✅ FIXED: Proper referral link generation
+                const baseUrl = window.location.origin;
+                const referralLink = `${baseUrl}/index.html?ref=${data.referral_code}`;
+                
                 document.getElementById('referralCode').value = data.referral_code;
-                document.getElementById('referralLink').value = `${window.location.origin}/signup.html?ref=${data.referral_code}`;
+                document.getElementById('referralLink').value = referralLink;
+
+                console.log('✅ Referral link generated:', referralLink);
 
             } catch (error) {
-                console.error('Error loading user data:', error);
+                console.error('❌ Error loading user data:', error);
             }
         }
 
         async function loadReferralStats() {
             try {
+                console.log('📊 Loading referral stats...');
+                
                 // Get referral network data
                 const networkByLevel = await getReferralNetwork(currentUser.id);
                 
@@ -321,7 +339,10 @@
                     .eq('user_id', currentUser.id)
                     .in('type', ['referral', 'commission']);
 
-                if (earnError) throw earnError;
+                if (earnError) {
+                    console.error('❌ Earnings stats error:', earnError);
+                    throw earnError;
+                }
 
                 const totalEarnings = earnings?.reduce((sum, earning) => sum + earning.coins, 0) || 0;
 
@@ -331,13 +352,17 @@
                 document.getElementById('activeReferrals').textContent = activeReferrals;
                 document.getElementById('totalEarnings').textContent = totalEarnings;
 
+                console.log('✅ Referral stats loaded');
+
             } catch (error) {
-                console.error('Error loading referral stats:', error);
+                console.error('❌ Error loading referral stats:', error);
             }
         }
 
         async function loadReferralNetwork() {
             try {
+                console.log('🌐 Loading referral network...');
+                
                 const networkByLevel = await getReferralNetwork(currentUser.id);
                 const container = document.getElementById('referralNetwork');
                 
@@ -349,13 +374,17 @@
                             <p class="text-gray-300 text-sm mt-2">Share your code to build your 7-level network</p>
                         </div>
                     `;
+                    document.getElementById('networkStats').textContent = '0 users across 7 levels';
                     return;
                 }
 
                 let networkHTML = '';
+                let totalUsers = 0;
+                
                 Object.keys(networkByLevel).forEach(level => {
                     const referrals = networkByLevel[level];
                     if (referrals.length > 0) {
+                        totalUsers += referrals.length;
                         networkHTML += `
                             <div class="mb-6">
                                 <h4 class="font-semibold mb-3 text-yellow-300">Level ${level} - ${referrals.length} users</h4>
@@ -373,7 +402,7 @@
                                             <i class="fas fa-user text-white text-sm"></i>
                                         </div>
                                         <div>
-                                            <div class="font-semibold">${ref.invitee.name || ref.invitee.email}</div>
+                                            <div class="font-semibold">${ref.invitee?.name || ref.invitee?.email || 'Unknown User'}</div>
                                             <div class="text-xs text-gray-300 flex items-center space-x-2">
                                                 <span>${new Date(ref.created_at).toLocaleDateString()}</span>
                                                 <span class="${statusColor}">
@@ -396,16 +425,12 @@
                 });
 
                 container.innerHTML = networkHTML;
-
-                // Update network stats
-                let totalUsers = 0;
-                Object.keys(networkByLevel).forEach(level => {
-                    totalUsers += networkByLevel[level].length;
-                });
                 document.getElementById('networkStats').textContent = `${totalUsers} users across 7 levels`;
 
+                console.log('✅ Referral network loaded');
+
             } catch (error) {
-                console.error('Error loading referral network:', error);
+                console.error('❌ Error loading referral network:', error);
             }
         }
 
@@ -424,6 +449,8 @@
 
         async function getReferralNetwork(userId) {
             try {
+                console.log('🔍 Fetching referral network...');
+                
                 const { data: referrals, error } = await supabase
                     .from('referrals')
                     .select(`
@@ -440,7 +467,10 @@
                     .order('level', { ascending: true })
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ Referral network fetch error:', error);
+                    throw error;
+                }
 
                 // Group by level and check activity
                 const networkByLevel = {};
@@ -452,7 +482,7 @@
                     
                     // Check if invitee is active today
                     const today = new Date().toISOString().split('T')[0];
-                    const isActive = ref.invitee.last_checkin === today;
+                    const isActive = ref.invitee?.last_checkin === today;
                     
                     networkByLevel[level].push({
                         ...ref,
@@ -460,9 +490,11 @@
                     });
                 });
 
+                console.log('✅ Referral network fetched');
                 return networkByLevel;
+                
             } catch (error) {
-                console.error('Error getting referral network:', error);
+                console.error('❌ Error getting referral network:', error);
                 return {};
             }
         }
@@ -485,15 +517,19 @@
 
         function shareWhatsApp() {
             const referralCode = document.getElementById('referralCode').value;
-            const message = `Join Earnzy and start earning money with 7-level referral system! Use my referral code: ${referralCode}. Sign up here: ${window.location.origin}/signup.html?ref=${referralCode}`;
+            const referralLink = document.getElementById('referralLink').value;
+            
+            const message = `Join Earnzy and start earning money with 7-level referral system! 💰\n\nUse my referral code: ${referralCode}\n\nSign up here: ${referralLink}\n\n✨ Earn 250 coins instantly!`;
             const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
         }
 
         function shareTelegram() {
             const referralCode = document.getElementById('referralCode').value;
-            const message = `Join Earnzy and start earning money with 7-level referral system! Use my referral code: ${referralCode}. Sign up here: ${window.location.origin}/signup.html?ref=${referralCode}`;
-            const url = `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(message)}`;
+            const referralLink = document.getElementById('referralLink').value;
+            
+            const message = `Join Earnzy and start earning money with 7-level referral system! 💰\n\nUse my referral code: ${referralCode}\n\nSign up here: ${referralLink}\n\n✨ Earn 250 coins instantly!`;
+            const url = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
         }
 
