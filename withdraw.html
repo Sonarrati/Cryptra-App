@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="google-adsense-account" content="ca-pub-3409420643457036">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw - Earnzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .premium-card { 
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .flutter-card {
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .flutter-button {
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+        }
+        .flutter-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .method-selected {
+            border: 2px solid #fbbf24;
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen pb-20">
+    <!-- Header -->
+    <header class="bg-white/10 backdrop-blur-lg border-b border-white/20">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <a href="dashboard.html" class="text-white">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Withdraw</h1>
+                        <p class="text-gray-200 text-sm">Convert coins to real money</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-yellow-300 font-bold text-lg" id="walletBalance">0</div>
+                    <div class="text-gray-300 text-sm">Coins</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Withdrawal Form -->
+    <section class="p-4">
+        <div class="container mx-auto">
+            <div class="premium-card rounded-3xl p-6 text-white mb-6 flutter-card">
+                <h2 class="text-2xl font-bold mb-6">Withdraw Funds</h2>
+
+                <!-- Balance Info -->
+                <div class="bg-white/20 rounded-2xl p-4 mb-4">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Available Balance:</span>
+                        <span class="text-yellow-300 font-bold" id="availableCoins">0 coins</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Withdrawal Fee:</span>
+                        <span class="text-red-300">5%</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Conversion Rate:</span>
+                        <span id="conversionRate">10,000 coins = ₹100</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span>Minimum Withdrawal:</span>
+                        <span id="minWithdrawal">10,000 coins</span>
+                    </div>
+                </div>
+
+                <!-- First Withdrawal Info -->
+                <div class="bg-yellow-500/20 border border-yellow-400 rounded-2xl p-4 mb-4 hidden" id="firstWithdrawalInfo">
+                    <div class="text-yellow-300 text-sm font-semibold">
+                        ✨ First Withdrawal Minimum: ₹20 (2,000 coins) for India / $1.5 (15,000 coins) for International
+                    </div>
+                </div>
+
+                <!-- Next Withdrawal Info -->
+                <div class="bg-blue-500/20 border border-blue-400 rounded-2xl p-4 mb-4 hidden" id="nextWithdrawalInfo">
+                    <div class="text-blue-300 text-sm font-semibold">
+                        📍 Next Withdrawals: ₹100 (10,000 coins) / $5 (50,000 coins) minimum
+                    </div>
+                </div>
+
+                <!-- Withdrawal Method -->
+                <div class="mb-6">
+                    <label class="block text-gray-300 text-sm font-semibold mb-3">Withdrawal Method</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button 
+                            onclick="selectMethod('UPI')"
+                            class="withdrawal-method bg-white/20 border-2 border-transparent rounded-2xl p-4 text-center hover:bg-white/30 transition-all duration-200 flutter-button"
+                            data-method="UPI"
+                        >
+                            <i class="fas fa-mobile-alt text-2xl text-blue-400 mb-2"></i>
+                            <div class="font-semibold">UPI</div>
+                            <div class="text-xs text-gray-300 mt-1">Min: 10K coins</div>
+                        </button>
+                        <button 
+                            onclick="selectMethod('Paytm')"
+                            class="withdrawal-method bg-white/20 border-2 border-transparent rounded-2xl p-4 text-center hover:bg-white/30 transition-all duration-200 flutter-button"
+                            data-method="Paytm"
+                        >
+                            <i class="fas fa-wallet text-2xl text-green-400 mb-2"></i>
+                            <div class="font-semibold">Paytm</div>
+                            <div class="text-xs text-gray-300 mt-1">Min: 10K coins</div>
+                        </button>
+                        <button 
+                            onclick="selectMethod('PayPal')"
+                            class="withdrawal-method bg-white/20 border-2 border-transparent rounded-2xl p-4 text-center hover:bg-white/30 transition-all duration-200 flutter-button"
+                            data-method="PayPal"
+                        >
+                            <i class="fab fa-paypal text-2xl text-blue-500 mb-2"></i>
+                            <div class="font-semibold">PayPal</div>
+                            <div class="text-xs text-gray-300 mt-1">Min: 50K coins</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Account Details -->
+                <div id="accountDetails" class="hidden space-y-4 mb-6">
+                    <div>
+                        <label class="block text-gray-300 text-sm font-semibold mb-2" id="accountLabel">Account Details</label>
+                        <input 
+                            type="text" 
+                            id="accountInput"
+                            class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-button"
+                            placeholder="Enter account details"
+                        >
+                    </div>
+                </div>
+
+                <!-- Amount -->
+                <div class="mb-6">
+                    <label class="block text-gray-300 text-sm font-semibold mb-2">Amount to Withdraw</label>
+                    <input 
+                        type="number" 
+                        id="withdrawAmount"
+                        class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-button"
+                        placeholder="Enter coins amount"
+                        min="10000"
+                        oninput="calculateNetAmount()"
+                    >
+                    <div class="text-xs text-gray-300 mt-1" id="minAmountText">Minimum: 10,000 coins</div>
+                </div>
+
+                <!-- Calculation -->
+                <div id="calculation" class="hidden bg-white/20 rounded-2xl p-4 mb-6">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Withdrawal Amount:</span>
+                        <span id="requestedAmount">0 coins</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Processing Fee (5%):</span>
+                        <span class="text-red-300" id="feeAmount">0 coins</span>
+                    </div>
+                    <div class="flex justify-between text-sm font-bold border-t border-white/20 pt-2">
+                        <span>You Will Receive:</span>
+                        <span class="text-green-300" id="netAmount">0 coins</span>
+                    </div>
+                    <div class="text-xs text-gray-300 mt-2 text-center" id="cashValue">≈ ₹0.00</div>
+                </div>
+
+                <button 
+                    onclick="processWithdrawal()"
+                    id="withdrawButton"
+                    class="w-full bg-yellow-400 text-gray-800 py-4 rounded-2xl font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flutter-button"
+                    disabled
+                >
+                    Process Withdrawal
+                </button>
+            </div>
+
+            <!-- Conversion Rates Info -->
+            <div class="premium-card rounded-3xl p-6 text-white mb-6 flutter-card">
+                <h3 class="text-lg font-bold mb-4">Conversion Rates</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-white/10 rounded-2xl">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-rupee-sign text-green-400"></i>
+                            <span>UPI / Paytm</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-yellow-300 font-bold">10,000 coins = ₹100</div>
+                            <div class="text-xs text-gray-300">Normal Min: 10,000 coins</div>
+                            <div class="text-xs text-green-300">First Time: 2,000 coins</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-white/10 rounded-2xl">
+                        <div class="flex items-center space-x-3">
+                            <i class="fab fa-paypal text-blue-400"></i>
+                            <span>PayPal</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-yellow-300 font-bold">50,000 coins = $5</div>
+                            <div class="text-xs text-gray-300">Normal Min: 50,000 coins</div>
+                            <div class="text-xs text-green-300">First Time: 15,000 coins</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Withdrawals -->
+            <div class="premium-card rounded-3xl p-6 text-white flutter-card">
+                <h3 class="text-lg font-bold mb-4">Recent Withdrawals</h3>
+                <div id="recentWithdrawals" class="space-y-3">
+                    <div class="text-center py-8">
+                        <i class="fas fa-history text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-400">No recent withdrawals</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-lg border-t border-white/20">
+        <div class="container mx-auto px-4 py-3">
+            <div class="grid grid-cols-4 gap-4">
+                <a href="dashboard.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-home text-xl mb-1"></i>
+                    <div class="text-xs">Home</div>
+                </a>
+                <a href="watch.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-coins text-xl mb-1"></i>
+                    <div class="text-xs">Earn</div>
+                </a>
+                <a href="withdraw.html" class="text-center text-yellow-400">
+                    <i class="fas fa-wallet text-xl mb-1"></i>
+                    <div class="text-xs font-semibold">Wallet</div>
+                </a>
+                <a href="profile.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-user text-xl mb-1"></i>
+                    <div class="text-xs">Profile</div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase - UPDATED
+        const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let userData = null;
+        let selectedMethod = null;
+        let minAmount = 10000;
+        let isFirstWithdrawal = false;
+
+        async function loadWithdrawPage() {
+            try {
+                // Check authentication
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = session.user;
+                await loadUserData();
+                await loadRecentWithdrawals();
+                await checkFirstWithdrawal();
+
+            } catch (error) {
+                console.error('Withdraw page load error:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function checkFirstWithdrawal() {
+            try {
+                const { data: withdrawals, error } = await supabase
+                    .from('withdrawals')
+                    .select('id')
+                    .eq('user_id', currentUser.id)
+                    .in('status', ['paid', 'pending']);
+
+                if (error) throw error;
+
+                isFirstWithdrawal = !withdrawals || withdrawals.length === 0;
+                
+                // Update UI based on first withdrawal status
+                updateWithdrawalInfoUI();
+
+            } catch (error) {
+                console.error('Error checking first withdrawal:', error);
+            }
+        }
+
+        function updateWithdrawalInfoUI() {
+            const firstWithdrawalInfo = document.getElementById('firstWithdrawalInfo');
+            const nextWithdrawalInfo = document.getElementById('nextWithdrawalInfo');
+
+            if (firstWithdrawalInfo) {
+                if (isFirstWithdrawal) {
+                    firstWithdrawalInfo.innerHTML = `
+                        ✨ First Withdrawal Minimum: 
+                        <span class="text-yellow-300">₹20 (2,000 coins) for India</span> / 
+                        <span class="text-yellow-300">$1.5 (15,000 coins) for International</span>
+                    `;
+                    firstWithdrawalInfo.classList.remove('hidden');
+                } else {
+                    firstWithdrawalInfo.classList.add('hidden');
+                }
+            }
+
+            if (nextWithdrawalInfo) {
+                nextWithdrawalInfo.innerHTML = `
+                    📍 Next Withdrawals: 
+                    <span class="text-green-300">₹100 (10,000 coins)</span> / 
+                    <span class="text-green-300">$5 (50,000 coins)</span> minimum
+                `;
+                if (isFirstWithdrawal) {
+                    nextWithdrawalInfo.classList.remove('hidden');
+                } else {
+                    nextWithdrawalInfo.classList.add('hidden');
+                }
+            }
+        }
+
+        async function loadUserData() {
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (error) throw error;
+
+                userData = data;
+                document.getElementById('walletBalance').textContent = data.total_coins || 0;
+                document.getElementById('availableCoins').textContent = (data.total_coins || 0) + ' coins';
+
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        async function loadRecentWithdrawals() {
+            try {
+                const { data, error } = await supabase
+                    .from('withdrawals')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                const container = document.getElementById('recentWithdrawals');
+                
+                if (data && data.length > 0) {
+                    container.innerHTML = data.map(withdrawal => {
+                        const statusColors = {
+                            pending: 'text-yellow-400',
+                            paid: 'text-green-400',
+                            rejected: 'text-red-400'
+                        };
+                        
+                        return `
+                            <div class="flex justify-between items-center py-3 border-b border-white/10 last:border-b-0">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                                        <i class="fas fa-wallet text-yellow-400 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold">${withdrawal.method}</div>
+                                        <div class="text-xs text-gray-300">${new Date(withdrawal.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-right font-bold">${withdrawal.coins_requested} coins</div>
+                                    <div class="text-xs ${statusColors[withdrawal.status]} capitalize">${withdrawal.status}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error('Error loading recent withdrawals:', error);
+            }
+        }
+
+        function selectMethod(method) {
+            selectedMethod = method;
+            
+            // Get minimum amount based on first withdrawal status and method
+            if (isFirstWithdrawal) {
+                minAmount = (method === 'PayPal') ? 15000 : 2000; // First withdrawal minimums
+            } else {
+                minAmount = (method === 'PayPal') ? 50000 : 10000; // Normal minimums
+            }
+            
+            // Reset all buttons
+            document.querySelectorAll('.withdrawal-method').forEach(btn => {
+                btn.classList.remove('method-selected');
+            });
+            
+            // Highlight selected button
+            const methodButton = document.querySelector(`[data-method="${method}"]`);
+            methodButton.classList.add('method-selected');
+            
+            // Update minimum amount in input field
+            document.getElementById('withdrawAmount').min = minAmount;
+            
+            // Update display text
+            const minText = isFirstWithdrawal ? 
+                `First Withdrawal Min: ${minAmount.toLocaleString()} coins` : 
+                `Minimum: ${minAmount.toLocaleString()} coins`;
+            
+            document.getElementById('minAmountText').textContent = minText;
+            document.getElementById('minWithdrawal').textContent = `${minAmount.toLocaleString()} coins`;
+            
+            // Update conversion rate display
+            if (method === 'PayPal') {
+                const rate = isFirstWithdrawal ? '15,000 coins = $1.5' : '50,000 coins = $5';
+                document.getElementById('conversionRate').textContent = rate;
+            } else {
+                const rate = isFirstWithdrawal ? '2,000 coins = ₹20' : '10,000 coins = ₹100';
+                document.getElementById('conversionRate').textContent = rate;
+            }
+            
+            // Show account details
+            const accountDetails = document.getElementById('accountDetails');
+            const accountLabel = document.getElementById('accountLabel');
+            const accountInput = document.getElementById('accountInput');
+            
+            accountDetails.classList.remove('hidden');
+            
+            switch(method) {
+                case 'UPI':
+                    accountLabel.textContent = 'UPI ID';
+                    accountInput.placeholder = 'yourname@upi';
+                    break;
+                case 'Paytm':
+                    accountLabel.textContent = 'Paytm Number';
+                    accountInput.placeholder = 'Enter your Paytm number';
+                    break;
+                case 'PayPal':
+                    accountLabel.textContent = 'PayPal Email';
+                    accountInput.placeholder = 'paypal@example.com';
+                    break;
+            }
+            
+            // Clear amount and recalculate
+            document.getElementById('withdrawAmount').value = '';
+            document.getElementById('calculation').classList.add('hidden');
+            validateForm();
+        }
+
+        function calculateNetAmount() {
+            const amount = parseInt(document.getElementById('withdrawAmount').value) || 0;
+            const calculation = document.getElementById('calculation');
+            
+            if (amount >= minAmount) {
+                const fee = Math.floor(amount * 0.05);
+                const netAmount = amount - fee;
+                
+                document.getElementById('requestedAmount').textContent = amount.toLocaleString() + ' coins';
+                document.getElementById('feeAmount').textContent = fee.toLocaleString() + ' coins';
+                document.getElementById('netAmount').textContent = netAmount.toLocaleString() + ' coins';
+                
+                // Calculate cash value based on method and first withdrawal
+                let cashValue = '';
+                if (selectedMethod === 'PayPal') {
+                    const rate = isFirstWithdrawal ? 0.0001 : 0.0001; // 15,000 = $1.5 (0.0001 per coin)
+                    const usdValue = (netAmount * rate).toFixed(2);
+                    cashValue = `≈ $${usdValue}`;
+                } else {
+                    const rate = isFirstWithdrawal ? 0.01 : 0.01; // 2,000 = ₹20 (0.01 per coin)
+                    const inrValue = (netAmount * rate).toFixed(2);
+                    cashValue = `≈ ₹${inrValue}`;
+                }
+                document.getElementById('cashValue').textContent = cashValue;
+                
+                calculation.classList.remove('hidden');
+            } else {
+                calculation.classList.add('hidden');
+            }
+            
+            validateForm();
+        }
+
+        function validateForm() {
+            const amount = parseInt(document.getElementById('withdrawAmount').value) || 0;
+            const account = document.getElementById('accountInput').value;
+            const button = document.getElementById('withdrawButton');
+            
+            if (selectedMethod && account && amount >= minAmount && amount <= (userData.total_coins || 0)) {
+                button.disabled = false;
+            } else {
+                button.disabled = true;
+            }
+        }
+
+        async function processWithdrawal() {
+            try {
+                const amount = parseInt(document.getElementById('withdrawAmount').value);
+                const account = document.getElementById('accountInput').value;
+                
+                if (amount < minAmount) {
+                    showNotification(`Minimum withdrawal is ${minAmount.toLocaleString()} coins for ${selectedMethod}`, 'error');
+                    return;
+                }
+                
+                if (amount > (userData.total_coins || 0)) {
+                    showNotification('Insufficient balance', 'error');
+                    return;
+                }
+                
+                const fee = Math.floor(amount * 0.05);
+                const netAmount = amount - fee;
+                
+                // Create withdrawal record
+                const { error: withdrawalError } = await supabase
+                    .from('withdrawals')
+                    .insert({
+                        user_id: currentUser.id,
+                        method: selectedMethod,
+                        account: account,
+                        coins_requested: amount,
+                        fee: fee,
+                        net_amount: netAmount,
+                        status: 'pending'
+                    });
+                
+                if (withdrawalError) throw withdrawalError;
+
+                // Mark first withdrawal as completed if it's the first one
+                if (isFirstWithdrawal) {
+                    await supabase
+                        .from('users')
+                        .update({ first_withdrawal_completed: true })
+                        .eq('id', currentUser.id);
+                }
+                
+                // Update user coins
+                const { error: updateError } = await supabase
+                    .from('users')
+                    .update({
+                        total_coins: userData.total_coins - amount,
+                        withdrawn_coins: (userData.withdrawn_coins || 0) + amount
+                    })
+                    .eq('id', currentUser.id);
+                
+                if (updateError) throw updateError;
+                
+                showNotification('Withdrawal request submitted successfully!', 'success');
+                
+                // Reset form
+                resetWithdrawalForm();
+                
+                // Reload data
+                await loadUserData();
+                await loadRecentWithdrawals();
+                await checkFirstWithdrawal(); // Refresh first withdrawal status
+                
+            } catch (error) {
+                console.error('Withdrawal error:', error);
+                showNotification('Failed to process withdrawal', 'error');
+            }
+        }
+
+        function resetWithdrawalForm() {
+            document.getElementById('withdrawAmount').value = '';
+            document.getElementById('accountInput').value = '';
+            document.getElementById('calculation').classList.add('hidden');
+            document.querySelectorAll('.withdrawal-method').forEach(btn => {
+                btn.classList.remove('method-selected');
+            });
+            selectedMethod = null;
+            document.getElementById('accountDetails').classList.add('hidden');
+            document.getElementById('withdrawButton').disabled = true;
+            
+            // Reset to default values
+            minAmount = 10000;
+            document.getElementById('withdrawAmount').min = minAmount;
+            document.getElementById('minAmountText').textContent = `Minimum: ${minAmount.toLocaleString()} coins`;
+            document.getElementById('minWithdrawal').textContent = `${minAmount.toLocaleString()} coins`;
+            document.getElementById('conversionRate').textContent = '10,000 coins = ₹100';
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.classList.remove('hidden');
+
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Add event listeners for real-time validation
+        document.getElementById('accountInput').addEventListener('input', validateForm);
+        document.getElementById('withdrawAmount').addEventListener('input', validateForm);
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', loadWithdrawPage);
+    </script>
+</body>
+</html>
