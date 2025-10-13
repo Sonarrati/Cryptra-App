@@ -15,293 +15,74 @@
             font-family: 'Poppins', sans-serif;
         }
         
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .glow {
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-        
-        .coin-animation {
-            animation: coin-spin 3s linear infinite;
-        }
-        
-        @keyframes coin-spin {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(360deg); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 1s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .slide-up {
-            animation: slideUp 0.8s ease-out;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
         .gradient-bg {
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
         }
         
-        .gradient-bg-2 {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-        
-        .gradient-bg-3 {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-        
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        .hidden-countdown {
-            display: none;
-        }
-
-        /* Flutter-style improvements */
         .flutter-card {
             border-radius: 24px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
+        
         .flutter-button {
             border-radius: 16px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 600;
         }
-
+        
         .flutter-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
     </style>
 </head>
 <body class="gradient-bg min-h-screen text-white">
-    <!-- Hidden Countdown Timer -->
-    <div class="hidden-countdown">
-        <span id="countdown">60</span>
-    </div>
-    
     <!-- Hero Section -->
     <section class="min-h-screen flex flex-col justify-center items-center px-4 text-center">
         <div class="max-w-4xl mx-auto">
-            <div class="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6 glow pulse">
-                <i class="fas fa-coins text-4xl text-gray-800 coin-animation"></i>
+            <div class="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-coins text-4xl text-gray-800"></i>
             </div>
             
-            <h1 class="text-4xl md:text-6xl font-bold mb-6 slide-up">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">
                 Play Games & Earn <span class="text-yellow-300">Real Money</span>
             </h1>
             
-            <p class="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto fade-in">
+            <p class="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
                 Instant Payouts • Daily Rewards • 7-Level Referral System
             </p>
             
-            <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 max-w-md mx-auto fade-in flutter-card">
+            <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 max-w-md mx-auto flutter-card">
                 <div class="text-3xl font-bold text-yellow-300 mb-2">₹35,000</div>
                 <div class="text-gray-300">Average Monthly Earnings</div>
             </div>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-                <a href="signup.html" id="start-earning" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 shadow-lg glow pulse flutter-button">
+                <a href="signup.html" id="start-earning" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 shadow-lg flutter-button">
                     <i class="fas fa-bolt mr-2"></i> Start Earning Now
                 </a>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 text-center card-hover flutter-card">
-                    <i class="fas fa-gamepad text-3xl text-yellow-300 mb-3"></i>
-                    <div class="text-2xl font-bold">100+</div>
-                    <div class="text-gray-300">Games to Play</div>
-                </div>
-                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 text-center card-hover flutter-card">
-                    <i class="fas fa-money-bill-wave text-3xl text-yellow-300 mb-3"></i>
-                    <div class="text-2xl font-bold">Instant</div>
-                    <div class="text-gray-300">Withdrawals</div>
-                </div>
-                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 text-center card-hover flutter-card">
-                    <i class="fas fa-users text-3xl text-yellow-300 mb-3"></i>
-                    <div class="text-2xl font-bold">10K+</div>
-                    <div class="text-gray-300">Happy Earners</div>
-                </div>
-            </div>
         </div>
     </section>
-    
-    <!-- Features Section -->
-    <section class="py-16 px-4">
-        <div class="max-w-6xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">How to Earn with Earnzy</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-6 text-center card-hover flutter-card">
-                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-play text-2xl text-purple-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Play Games</h3>
-                    <p class="text-gray-200">Earn coins by playing fun games</p>
-                    <div class="mt-4 text-yellow-300 font-bold">Upto 1,000 Coins</div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-blue-500 to-teal-400 rounded-2xl p-6 text-center card-hover flutter-card">
-                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-book-open text-2xl text-blue-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Read & Earn</h3>
-                    <p class="text-gray-200">Get paid for reading articles</p>
-                    <div class="mt-4 text-yellow-300 font-bold">Upto 10,000 Coins</div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-green-500 to-cyan-400 rounded-2xl p-6 text-center card-hover flutter-card">
-                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-user-friends text-2xl text-green-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">7-Level Referral</h3>
-                    <p class="text-gray-200">Earn from 7 levels of referrals</p>
-                    <div class="mt-4 text-yellow-300 font-bold">4.5% to 0.002%</div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-center card-hover flutter-card">
-                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-gift text-2xl text-orange-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Daily Rewards</h3>
-                    <p class="text-gray-200">Login daily for bonus coins</p>
-                    <div class="mt-4 text-yellow-300 font-bold">100% Extra Earning</div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Testimonials -->
-    <section class="py-16 px-4 bg-white/5">
-        <div class="max-w-6xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">What Our Users Say</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 flutter-card">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-user text-gray-800"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold">Rahul Sharma</div>
-                            <div class="text-yellow-300">★★★★★</div>
-                        </div>
-                    </div>
-                    <p class="text-gray-200">"I earned ₹35,000 in my first month just by playing games in my free time. The 7-level referral system is amazing!"</p>
-                </div>
-                
-                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 flutter-card">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-user text-gray-800"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold">Priya Patel</div>
-                            <div class="text-yellow-300">★★★★★</div>
-                        </div>
-                    </div>
-                    <p class="text-gray-200">"The daily login bonus and 7-level referral program helped me earn extra money for my college expenses."</p>
-                </div>
-                
-                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 flutter-card">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-user text-gray-800"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold">Amit Kumar</div>
-                            <div class="text-yellow-300">★★★★★</div>
-                        </div>
-                    </div>
-                    <p class="text-gray-200">"I was skeptical at first, but after withdrawing ₹35,000, I'm convinced. This app really pays!"</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Final CTA -->
-    <section class="py-16 px-4 text-center">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Start Your Earning Journey?</h2>
-            <p class="text-xl text-gray-300 mb-8">Join thousands of users who are earning real money with Earnzy</p>
-            
-            <div class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-8 max-w-2xl mx-auto mb-8 flutter-card">
-                <h3 class="text-2xl font-bold mb-2 text-gray-800">Limited Time Offer!</h3>
-                <p class="text-gray-800 mb-4">Sign up today and get 100 bonus coins instantly</p>
-                <div class="text-4xl font-bold text-gray-800">100% FREE</div>
-            </div>
-            
-            <a href="signup.html" class="bg-yellow-400 text-gray-900 px-12 py-4 rounded-2xl font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 inline-block shadow-lg glow flutter-button">
-                <i class="fas fa-rocket mr-2"></i> Create Your Account Now
-            </a>
-        </div>
-    </section>
-    
-    <!-- Footer -->
-    <footer class="py-8 px-4 border-t border-white/20 text-center text-gray-300">
-        <p>&copy; 2024 Earnzy. All rights reserved. Start your earning journey today!</p>
-    </footer>
 
     <script>
-        // Countdown and redirect functionality
-        let countdown = 60;
-        const countdownElement = document.getElementById('countdown');
-        
-        const countdownInterval = setInterval(() => {
-            countdown--;
-            countdownElement.textContent = countdown;
-            
-            if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                window.location.href = 'signup.html';
-            }
-        }, 1000);
-        
-        // Manual redirect button
-        document.getElementById('start-earning').addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = 'signup.html';
-        });
-        
-        // Add some interactive elements
+        // ✅ Referral parameter handling for homepage
         document.addEventListener('DOMContentLoaded', function() {
-            // Add hover effect to earning cards
-            const cards = document.querySelectorAll('.card-hover');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.classList.add('glow');
-                });
+            const urlParams = new URLSearchParams(window.location.search);
+            const referralCode = urlParams.get('ref');
+            
+            if (referralCode) {
+                console.log('🔗 Referral code detected in homepage:', referralCode);
                 
-                card.addEventListener('mouseleave', function() {
-                    this.classList.remove('glow');
-                });
-            });
+                // Add referral code to signup link
+                const signupLink = document.getElementById('start-earning');
+                signupLink.href = `signup.html?ref=${referralCode}`;
+                
+                // Show notification
+                setTimeout(() => {
+                    alert(`🎉 Welcome! You were referred by someone. Use their code to get 250 bonus coins!`);
+                }, 1000);
+            }
         });
     </script>
 </body>
