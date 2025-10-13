@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="google-adsense-account" content="ca-pub-3409420643457036">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Earnzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .premium-card { 
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .flutter-card {
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .flutter-button {
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+        }
+        .flutter-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .flutter-input {
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .flutter-input:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen pb-20">
+    <!-- Header -->
+    <header class="bg-white/10 backdrop-blur-lg border-b border-white/20">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <a href="dashboard.html" class="text-white">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Profile</h1>
+                    </div>
+                </div>
+                <button onclick="signOut()" class="bg-white/20 text-white px-4 py-2 rounded-2xl hover:bg-white/30 transition-all duration-200 flutter-button">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Profile Info -->
+    <section class="p-4">
+        <div class="container mx-auto">
+            <div class="premium-card rounded-3xl p-6 text-white mb-6 flutter-card">
+                <div class="flex items-center space-x-4 mb-6">
+                    <div class="w-16 h-16 bg-yellow-400 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-user text-2xl text-gray-800"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold" id="profileName">Loading...</h2>
+                        <p class="text-gray-300 text-sm" id="profileEmail">Loading...</p>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="text-center">
+                        <div class="text-yellow-300 font-bold text-lg" id="totalCoins">0</div>
+                        <div class="text-gray-300 text-xs">Coins</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-green-300 font-bold text-lg" id="dailyStreak">0</div>
+                        <div class="text-gray-300 text-xs">Streak</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-blue-300 font-bold text-lg" id="referralCount">0</div>
+                        <div class="text-gray-300 text-xs">Refs</div>
+                    </div>
+                </div>
+
+                <!-- Referral Code -->
+                <div class="mb-4">
+                    <label class="block text-gray-300 text-sm font-semibold mb-2">Your Referral Code</label>
+                    <div class="flex space-x-2">
+                        <input 
+                            type="text" 
+                            id="referralCode"
+                            class="flex-1 bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white font-mono text-center flutter-input"
+                            readonly
+                        >
+                        <button 
+                            onclick="copyReferralCode()"
+                            class="bg-yellow-400 text-gray-800 px-4 py-3 rounded-2xl font-semibold hover:bg-yellow-300 transition-all duration-200 flutter-button"
+                        >
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Profile Update Form -->
+    <section class="p-4">
+        <div class="container mx-auto">
+            <div class="premium-card rounded-3xl p-6 text-white mb-6 flutter-card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold">Update Profile</h3>
+                    <button onclick="toggleSection('profileForm')" class="text-gray-300 hover:text-white transition-colors">
+                        <i class="fas fa-chevron-down" id="profileFormIcon"></i>
+                    </button>
+                </div>
+                
+                <form id="profileForm" class="accordion-content">
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm font-semibold mb-2">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="name"
+                            class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-input"
+                            placeholder="Enter your full name"
+                        >
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm font-semibold mb-2">UPI ID</label>
+                        <input 
+                            type="text" 
+                            id="upiId"
+                            class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-input"
+                            placeholder="yourname@upi"
+                        >
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-semibold mb-2">PayPal Email</label>
+                        <input 
+                            type="email" 
+                            id="paypalEmail"
+                            class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-input"
+                            placeholder="paypal@example.com"
+                        >
+                    </div>
+                    <button 
+                        type="submit"
+                        class="w-full bg-yellow-400 text-gray-800 py-4 rounded-2xl font-semibold hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 flutter-button"
+                    >
+                        Update Profile
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Change Password -->
+    <section class="p-4">
+        <div class="container mx-auto">
+            <div class="premium-card rounded-3xl p-6 text-white mb-6 flutter-card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold">Change Password</h3>
+                    <button onclick="toggleSection('passwordForm')" class="text-gray-300 hover:text-white transition-colors">
+                        <i class="fas fa-chevron-down" id="passwordFormIcon"></i>
+                    </button>
+                </div>
+                
+                <form id="passwordForm" class="accordion-content">
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm font-semibold mb-2">Current Password</label>
+                        <input 
+                            type="password" 
+                            id="currentPassword"
+                            class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-input"
+                            placeholder="Enter current password"
+                        >
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm font-semibold mb-2">New Password</label>
+                        <input 
+                            type="password" 
+                            id="newPassword"
+                            class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-input"
+                            placeholder="Enter new password (min. 6 characters)"
+                            minlength="6"
+                        >
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-semibold mb-2">Confirm New Password</label>
+                        <input 
+                            type="password" 
+                            id="confirmPassword"
+                            class="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent flutter-input"
+                            placeholder="Confirm new password"
+                            minlength="6"
+                        >
+                    </div>
+                    <button 
+                        type="submit"
+                        class="w-full bg-blue-500 text-white py-4 rounded-2xl font-semibold hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 flutter-button"
+                    >
+                        Change Password
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7-Level Referral Info -->
+    <section class="p-4">
+        <div class="container mx-auto">
+            <div class="premium-card rounded-3xl p-6 text-white mb-6 flutter-card">
+                <h3 class="text-lg font-bold mb-4">7-Level Referral System</h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between items-center p-3 bg-white/10 rounded-2xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold">1</span>
+                            </div>
+                            <span>Level 1 (Direct)</span>
+                        </div>
+                        <span class="text-yellow-300 font-bold">4.5%</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-white/10 rounded-2xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold">2</span>
+                            </div>
+                            <span>Level 2</span>
+                        </div>
+                        <span class="text-yellow-300 font-bold">2.0%</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-white/10 rounded-2xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold">3</span>
+                            </div>
+                            <span>Level 3</span>
+                        </div>
+                        <span class="text-yellow-300 font-bold">1.0%</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-white/10 rounded-2xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold">4</span>
+                            </div>
+                            <span>Level 4</span>
+                        </div>
+                        <span class="text-yellow-300 font-bold">0.5%</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-white/10 rounded-2xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold">5</span>
+                            </div>
+                            <span>Level 5</span>
+                        </div>
+                        <span class="text-yellow-300 font-bold">0.1%</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-white/10 rounded-2xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold">6</span>
+                            </div>
+                            <span>Level 6</span>
+                        </div>
+                        <span class="text-yellow-300 font-bold">0.01%</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-white/10 rounded-2xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold">7</span>
+                            </div>
+                            <span>Level 7</span>
+                        </div>
+                        <span class="text-yellow-300 font-bold">0.002%</span>
+                    </div>
+                </div>
+                <div class="mt-4 text-xs text-gray-300">
+                    <p>💡 <strong>Note:</strong> Commissions are only paid when your referrals are active (daily check-in required)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="p-4">
+        <div class="container mx-auto">
+            <div class="premium-card rounded-3xl p-6 text-white flutter-card">
+                <h3 class="text-lg font-bold mb-4">FAQ & Help</h3>
+                <div class="space-y-4">
+                    <!-- FAQ Item 1 -->
+                    <div class="border-b border-white/20 pb-4">
+                        <button class="accordion-header w-full text-left font-semibold flex justify-between items-center">
+                            How do I earn coins?
+                            <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                        </button>
+                        <div class="accordion-content mt-2 text-gray-300 text-sm">
+                            You can earn coins by watching ads (10-20 coins each), scratching cards (5-50 coins), daily check-ins (10-100 coins based on streak), opening treasure boxes (20-200 coins), and referring friends (250 coins each + 7-level commissions).
+                        </div>
+                    </div>
+                    <!-- FAQ Item 2 -->
+                    <div class="border-b border-white/20 pb-4">
+                        <button class="accordion-header w-full text-left font-semibold flex justify-between items-center">
+                            How does the 7-level referral work?
+                            <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                        </button>
+                        <div class="accordion-content mt-2 text-gray-300 text-sm">
+                            You earn commissions from 7 levels of your network: Level 1 (4.5%), Level 2 (2%), Level 3 (1%), Level 4 (0.5%), Level 5 (0.1%), Level 6 (0.01%), Level 7 (0.002%). Commissions are only paid when referrals are active (daily check-in required).
+                        </div>
+                    </div>
+                    <!-- FAQ Item 3 -->
+                    <div class="border-b border-white/20 pb-4">
+                        <button class="accordion-header w-full text-left font-semibold flex justify-between items-center">
+                            When can I withdraw?
+                            <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                        </button>
+                        <div class="accordion-content mt-2 text-gray-300 text-sm">
+                            First withdrawal: ₹20 (2,000 coins) for India / $1.5 (15,000 coins) for International. Next withdrawals: ₹100 (10,000 coins) / $5 (50,000 coins) minimum. Withdrawals are processed manually within 3-5 business days.
+                        </div>
+                    </div>
+                    <!-- FAQ Item 4 -->
+                    <div class="border-b border-white/20 pb-4">
+                        <button class="accordion-header w-full text-left font-semibold flex justify-between items-center">
+                            Is there a withdrawal fee?
+                            <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                        </button>
+                        <div class="accordion-content mt-2 text-gray-300 text-sm">
+                            Yes, there's a 5% processing fee on all withdrawals. For example, if you withdraw 10,000 coins, you'll receive 9,500 coins worth after the fee deduction.
+                        </div>
+                    </div>
+                    <!-- FAQ Item 5 -->
+                    <div class="pb-4">
+                        <button class="accordion-header w-full text-left font-semibold flex justify-between items-center">
+                            What are the daily limits?
+                            <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                        </button>
+                        <div class="accordion-content mt-2 text-gray-300 text-sm">
+                            Watch Ads: 50 per day • Scratch Cards: 3 per day • Daily Check-in: 1 per day • Treasure Box: 1 per day • No limits on referrals!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-lg border-t border-white/20">
+        <div class="container mx-auto px-4 py-3">
+            <div class="grid grid-cols-4 gap-4">
+                <a href="dashboard.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-home text-xl mb-1"></i>
+                    <div class="text-xs">Home</div>
+                </a>
+                <a href="watch.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-coins text-xl mb-1"></i>
+                    <div class="text-xs">Earn</div>
+                </a>
+                <a href="withdraw.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-wallet text-xl mb-1"></i>
+                    <div class="text-xs">Wallet</div>
+                </a>
+                <a href="profile.html" class="text-center text-yellow-400">
+                    <i class="fas fa-user text-xl mb-1"></i>
+                    <div class="text-xs font-semibold">Profile</div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase - UPDATED
+        const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+
+        async function loadProfile() {
+            try {
+                // Check authentication
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = session.user;
+
+                // Load user data
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (error) throw error;
+
+                // Update UI
+                document.getElementById('profileName').textContent = user.name || user.email;
+                document.getElementById('profileEmail').textContent = user.email;
+                document.getElementById('referralCode').value = user.referral_code;
+                document.getElementById('name').value = user.name || '';
+                document.getElementById('upiId').value = user.upi_id || '';
+                document.getElementById('paypalEmail').value = user.paypal_email || '';
+                document.getElementById('totalCoins').textContent = user.total_coins || 0;
+                document.getElementById('dailyStreak').textContent = user.daily_streak || 0;
+
+                // Load referral count
+                await loadReferralCount(user.id);
+
+            } catch (error) {
+                console.error('Profile load error:', error);
+                showNotification('Failed to load profile data', 'error');
+            }
+        }
+
+        async function loadReferralCount(userId) {
+            try {
+                const { data: referrals, error } = await supabase
+                    .from('referrals')
+                    .select('id')
+                    .eq('inviter_id', userId)
+                    .eq('level', 1);
+
+                if (!error) {
+                    document.getElementById('referralCount').textContent = referrals?.length || 0;
+                }
+            } catch (error) {
+                console.error('Error loading referral count:', error);
+            }
+        }
+
+        // Profile form submission - FIXED
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const upiId = document.getElementById('upiId').value;
+            const paypalEmail = document.getElementById('paypalEmail').value;
+
+            try {
+                const { error } = await supabase
+                    .from('users')
+                    .update({
+                        name: name,
+                        upi_id: upiId,
+                        paypal_email: paypalEmail,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', currentUser.id);
+
+                if (error) throw error;
+
+                // Update displayed name immediately
+                document.getElementById('profileName').textContent = name || currentUser.email;
+                showNotification('Profile updated successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Profile update error:', error);
+                showNotification('Failed to update profile: ' + error.message, 'error');
+            }
+        });
+
+        // Password form submission - FIXED
+        document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                showNotification('New passwords do not match', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showNotification('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            try {
+                // First verify current password by trying to sign in
+                const { error: signInError } = await supabase.auth.signInWithPassword({
+                    email: currentUser.email,
+                    password: currentPassword
+                });
+
+                if (signInError) {
+                    showNotification('Current password is incorrect', 'error');
+                    return;
+                }
+
+                // Update password
+                const { error } = await supabase.auth.updateUser({
+                    password: newPassword
+                });
+
+                if (error) throw error;
+
+                showNotification('Password updated successfully!', 'success');
+                
+                // Clear form
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                
+            } catch (error) {
+                console.error('Password update error:', error);
+                showNotification('Failed to update password: ' + error.message, 'error');
+            }
+        });
+
+        // Copy referral code
+        function copyReferralCode() {
+            const referralCode = document.getElementById('referralCode');
+            referralCode.select();
+            referralCode.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(referralCode.value);
+            showNotification('Referral code copied!', 'success');
+        }
+
+        // Toggle section visibility
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(sectionId + 'Icon');
+            
+            if (section.style.maxHeight && section.style.maxHeight !== '0px') {
+                section.style.maxHeight = '0px';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                section.style.maxHeight = section.scrollHeight + 'px';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // FAQ Accordion
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('i');
+                
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.classList.remove('hidden');
+
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        async function signOut() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (!error) {
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        }
+
+        // Initialize forms as collapsed by default
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state for accordions
+            document.querySelectorAll('.accordion-content').forEach(content => {
+                content.style.maxHeight = '0px';
+            });
+            
+            // Load profile data
+            loadProfile();
+        });
+    </script>
+</body>
+</html>
