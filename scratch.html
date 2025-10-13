@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="google-adsense-account" content="ca-pub-3409420643457036">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch Cards - Earnzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .premium-card { 
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .scratch-card {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4, #FFEAA7);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .flutter-card {
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .flutter-button {
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+        }
+        .flutter-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen pb-20">
+    <!-- Header -->
+    <header class="bg-white/10 backdrop-blur-lg border-b border-white/20">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <a href="dashboard.html" class="text-white">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Scratch Cards</h1>
+                        <p class="text-gray-200 text-sm">Earn 5-50 coins per card</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-yellow-300 font-bold text-lg" id="todayEarnings">0</div>
+                    <div class="text-gray-300 text-sm">Today</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Scratch Cards -->
+    <section class="p-4">
+        <div class="container mx-auto">
+            <div class="premium-card rounded-3xl p-6 text-white mb-6 text-center flutter-card">
+                <div class="w-20 h-20 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-scroll text-3xl text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Scratch & Win</h2>
+                <p class="text-gray-300 mb-4">Reveal hidden rewards under each card</p>
+                
+                <div class="bg-white/20 rounded-2xl p-4 mb-6">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Coins per card:</span>
+                        <span class="text-yellow-300">5-50 coins</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Daily limit:</span>
+                        <span>3 cards</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span>Scratched today:</span>
+                        <span id="scratchedToday">0/3</span>
+                    </div>
+                </div>
+
+                <!-- Cards Grid -->
+                <div class="grid grid-cols-3 gap-4 mb-6" id="cardsGrid">
+                    <!-- Cards will be generated here -->
+                </div>
+
+                <!-- Result Display -->
+                <div id="resultDisplay" class="hidden bg-white/20 rounded-2xl p-6 mb-4">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-gift text-2xl text-gray-800"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Congratulations!</h3>
+                        <p class="text-gray-300">You won <span id="wonCoins" class="text-yellow-300 font-bold text-2xl">0</span> coins!</p>
+                        <p class="text-sm text-green-300 mt-2">
+                            <i class="fas fa-users mr-1"></i>
+                            Your network earns commissions too!
+                        </p>
+                    </div>
+                </div>
+
+                <button 
+                    onclick="resetCards()"
+                    id="resetButton"
+                    class="w-full bg-yellow-400 text-gray-800 py-4 rounded-2xl font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 hidden flutter-button"
+                >
+                    Scratch Another Card
+                </button>
+            </div>
+
+            <!-- Recent Winnings -->
+            <div class="premium-card rounded-3xl p-6 text-white flutter-card">
+                <h3 class="text-lg font-bold mb-4">Recent Winnings</h3>
+                <div id="recentWinnings" class="space-y-3">
+                    <div class="text-center py-8">
+                        <i class="fas fa-history text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-400">No recent winnings</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-lg border-t border-white/20">
+        <div class="container mx-auto px-4 py-3">
+            <div class="grid grid-cols-4 gap-4">
+                <a href="dashboard.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-home text-xl mb-1"></i>
+                    <div class="text-xs">Home</div>
+                </a>
+                <a href="watch.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-coins text-xl mb-1"></i>
+                    <div class="text-xs">Earn</div>
+                </a>
+                <a href="withdraw.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-wallet text-xl mb-1"></i>
+                    <div class="text-xs">Wallet</div>
+                </a>
+                <a href="profile.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                    <i class="fas fa-user text-xl mb-1"></i>
+                    <div class="text-xs">Profile</div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase - UPDATED
+        const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let todayEarnings = [];
+        let availableCards = 3;
+
+        async function loadScratchPage() {
+            try {
+                // Check authentication
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = session.user;
+                await loadTodayEarnings();
+                await loadRecentWinnings();
+                generateCards();
+
+            } catch (error) {
+                console.error('Scratch page load error:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function loadTodayEarnings() {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                
+                const { data, error } = await supabase
+                    .from('earnings')
+                    .select('coins')
+                    .eq('user_id', currentUser.id)
+                    .eq('type', 'scratch')
+                    .gte('created_at', today + 'T00:00:00')
+                    .lte('created_at', today + 'T23:59:59');
+
+                if (error) throw error;
+
+                todayEarnings = data || [];
+                const totalToday = todayEarnings.reduce((sum, earning) => sum + earning.coins, 0);
+                const scratchedToday = todayEarnings.length;
+                availableCards = 3 - scratchedToday;
+
+                document.getElementById('todayEarnings').textContent = totalToday;
+                document.getElementById('scratchedToday').textContent = `${scratchedToday}/3`;
+
+            } catch (error) {
+                console.error('Error loading today earnings:', error);
+            }
+        }
+
+        async function loadRecentWinnings() {
+            try {
+                const { data, error } = await supabase
+                    .from('earnings')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('type', 'scratch')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                const container = document.getElementById('recentWinnings');
+                
+                if (data && data.length > 0) {
+                    container.innerHTML = data.map(earning => `
+                        <div class="flex justify-between items-center py-2 border-b border-white/10 last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                                    <i class="fas fa-scroll text-yellow-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Scratch Card</div>
+                                    <div class="text-xs text-gray-300">${new Date(earning.created_at).toLocaleTimeString()}</div>
+                                </div>
+                            </div>
+                            <div class="text-green-400 font-bold">+${earning.coins}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading recent winnings:', error);
+            }
+        }
+
+        function generateCards() {
+            const grid = document.getElementById('cardsGrid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < 3; i++) {
+                const card = document.createElement('div');
+                card.className = `scratch-card rounded-2xl aspect-square flex items-center justify-center cursor-pointer transform hover:scale-105 transition-all duration-300 ${i >= availableCards ? 'opacity-50 cursor-not-allowed' : ''}`;
+                card.innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-question text-2xl text-white mb-2"></i>
+                        <div class="text-white font-semibold">Card ${i + 1}</div>
+                    </div>
+                `;
+
+                if (i < availableCards) {
+                    card.onclick = () => scratchCard(i);
+                }
+
+                grid.appendChild(card);
+            }
+        }
+
+        async function scratchCard(cardIndex) {
+            try {
+                // Check daily limit
+                if (todayEarnings.length >= 3) {
+                    showNotification('Daily limit reached (3 cards)', 'error');
+                    return;
+                }
+
+                // Generate random coins between 5-50
+                const coins = Math.floor(Math.random() * 46) + 5;
+
+                // Update coins in database
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (userError) throw userError;
+
+                const { error: updateError } = await supabase
+                    .from('users')
+                    .update({
+                        total_coins: userData.total_coins + coins,
+                        earned_coins: userData.earned_coins + coins
+                    })
+                    .eq('id', currentUser.id);
+
+                if (updateError) throw updateError;
+
+                // Add earning record
+                const { error: earningError } = await supabase
+                    .from('earnings')
+                    .insert({
+                        user_id: currentUser.id,
+                        type: 'scratch',
+                        coins: coins
+                    });
+
+                if (earningError) throw earningError;
+
+                // Show result
+                document.getElementById('wonCoins').textContent = coins;
+                document.getElementById('resultDisplay').classList.remove('hidden');
+                document.getElementById('resetButton').classList.remove('hidden');
+
+                // Update UI
+                await loadTodayEarnings();
+                await loadRecentWinnings();
+                generateCards();
+
+                showNotification(`You won ${coins} coins!`, 'success');
+
+            } catch (error) {
+                console.error('Scratch card error:', error);
+                showNotification('Failed to process scratch card', 'error');
+            }
+        }
+
+        function resetCards() {
+            document.getElementById('resultDisplay').classList.add('hidden');
+            document.getElementById('resetButton').classList.add('hidden');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.classList.remove('hidden');
+
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', loadScratchPage);
+    </script>
+</body>
+</html>
