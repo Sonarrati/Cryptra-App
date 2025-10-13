@@ -1,4 +1,4 @@
-// Supabase configuration - UPDATED
+// Supabase configuration - FIXED
 const SUPABASE_URL = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
 
@@ -8,25 +8,38 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // Auth state management
 let currentUser = null;
 
-// Check authentication state
+// Check authentication state - FIXED
 async function checkAuth() {
     try {
+        console.log('🔐 Checking authentication...');
         const { data: { session }, error } = await supabase.auth.getSession();
-        if (session) {
+        
+        if (error) {
+            console.error('❌ Auth session error:', error);
+            return false;
+        }
+        
+        if (session && session.user) {
             currentUser = session.user;
+            console.log('✅ User authenticated:', session.user.email);
             return true;
         }
+        
+        console.log('❌ No active session found');
         return false;
     } catch (error) {
-        console.error('Auth check error:', error);
+        console.error('❌ Auth check error:', error);
         return false;
     }
 }
 
-// Redirect if not authenticated
+// Redirect if not authenticated - FIXED
 async function requireAuth(redirectTo = 'login.html') {
+    console.log('🛡️ Checking auth requirement...');
     const isAuthenticated = await checkAuth();
+    
     if (!isAuthenticated) {
+        console.log('🚫 Not authenticated, redirecting to login');
         window.location.href = redirectTo;
         return false;
     }
@@ -110,7 +123,7 @@ async function isUserActive(userId) {
     }
 }
 
-// Distribute referral commissions
+// Distribute referral commissions - FIXED
 async function distributeReferralCommissions(earnerId, earnedCoins, earningType) {
     try {
         if (earningType === 'commission') return; // Prevent commission on commission
@@ -138,12 +151,12 @@ async function distributeReferralCommissions(earnerId, earnedCoins, earningType)
                 
                 if (commission > 0) {
                     // Update referrer's coins
-                    await updateCoins(referrerId, commission, 'earn');
+                    await updateCoins(referrerId, commission, 'earn', 'commission');
                     
                     // Add commission record
                     await addEarningRecord(referrerId, 'commission', commission, level);
                     
-                    console.log(`Level ${level} commission: ${commission} coins to user ${referrerId}`);
+                    console.log(`💰 Level ${level} commission: ${commission} coins to user ${referrerId}`);
                 }
             }
 
@@ -154,3 +167,15 @@ async function distributeReferralCommissions(earnerId, earnedCoins, earningType)
         console.error('Error distributing referral commissions:', error);
     }
 }
+
+// Auth state listener - ADDED FOR BETTER SESSION MANAGEMENT
+supabase.auth.onAuthStateChange((event, session) => {
+    console.log('🔑 Auth state changed:', event);
+    if (session) {
+        currentUser = session.user;
+        console.log('✅ User session restored:', session.user.email);
+    } else {
+        currentUser = null;
+        console.log('❌ User signed out');
+    }
+});
