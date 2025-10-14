@@ -184,3 +184,228 @@ async function getReferralNetwork(userId) {
         return {};
     }
 }
+
+// ✅ URL se referral code extract karein aur store karein
+function handleReferralFromURL() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        
+        if (refCode && refCode.length >= 6) {
+            console.log('🔗 Referral code detected in URL:', refCode);
+            
+            // Referral code localStorage mein save karein
+            localStorage.setItem('pendingReferral', refCode);
+            
+            // Clean URL (browser history se referral code hata de)
+            if (window.history && window.history.replaceState) {
+                const cleanURL = window.location.pathname;
+                window.history.replaceState({}, document.title, cleanURL);
+            }
+            
+            return refCode;
+        }
+    } catch (error) {
+        console.error('❌ Error handling referral from URL:', error);
+    }
+    return null;
+}
+
+// ✅ Signup/registration ke time referral code use karein
+async function applyPendingReferral(userId) {
+    try {
+        const pendingRef = localStorage.getItem('pendingReferral');
+        
+        if (pendingRef && userId) {
+            console.log('🔗 Applying referral code:', pendingRef, 'for user:', userId);
+            
+            // Aapka existing processReferral function call karein
+            await processReferral(userId, pendingRef);
+            
+            // Clear pending referral
+            localStorage.removeItem('pendingReferral');
+            
+            return true;
+        }
+    } catch (error) {
+        console.error('❌ Error applying pending referral:', error);
+    }
+    return false;
+}
+
+// ✅ Generate Proper Referral Link for Sharing
+function generateReferralLink() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || !user.referral_code) {
+            console.log('❌ User or referral code not found');
+            return 'https://sonarrati.github.io/Cryptra-App/';
+        }
+        
+        // YEH HI LINK SHARE KAREIN - Best working
+        const referralLink = `https://sonarrati.github.io/Cryptra-App/?ref=${user.referral_code}`;
+        console.log('✅ Generated referral link:', referralLink);
+        return referralLink;
+    } catch (error) {
+        console.error('❌ Error generating referral link:', error);
+        return 'https://sonarrati.github.io/Cryptra-App/';
+    }
+}
+
+// ✅ Copy Referral Link to Clipboard
+async function copyReferralLink() {
+    try {
+        const referralLink = generateReferralLink();
+        
+        // Modern clipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(referralLink);
+        } else {
+            // Fallback for older browsers
+            const tempInput = document.createElement('input');
+            tempInput.value = referralLink;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+        }
+        
+        // Success message
+        showNotification('✅ Referral link copied to clipboard!', 'success');
+        return true;
+    } catch (error) {
+        console.error('❌ Error copying referral link:', error);
+        showNotification('❌ Failed to copy link', 'error');
+        return false;
+    }
+}
+
+// ✅ Show Notification
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-2xl shadow-lg ${
+        type === 'success' ? 'bg-green-500 text-white' : 
+        type === 'error' ? 'bg-red-500 text-white' : 
+        'bg-blue-500 text-white'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center space-x-2">
+            <i class="fas ${type === 'success' ? 'fa-check' : type === 'error' ? 'fa-times' : 'fa-info'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// ✅ Load Referral Page Data
+async function loadReferralPage() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Referral stats load karein
+        const stats = await getReferralStats(user.id);
+        displayReferralStats(stats);
+        
+        // Referral network load karein
+        const network = await getReferralNetwork(user.id);
+        displayReferralNetwork(network);
+        
+        // Referral link display karein
+        const referralLinkElement = document.getElementById('referralLink');
+        if (referralLinkElement) {
+            referralLinkElement.value = generateReferralLink();
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading referral page:', error);
+    }
+}
+
+// ✅ Display Referral Stats
+function displayReferralStats(stats) {
+    const totalReferralsElement = document.getElementById('totalReferrals');
+    const totalEarningsElement = document.getElementById('totalEarnings');
+    const levelsEarningsElement = document.getElementById('levelsEarnings');
+    
+    if (totalReferralsElement) {
+        totalReferralsElement.textContent = stats.totalReferrals || 0;
+    }
+    
+    if (totalEarningsElement) {
+        totalEarningsElement.textContent = stats.totalEarnings || 0;
+    }
+    
+    // Level-wise earnings display karein
+    if (levelsEarningsElement) {
+        levelsEarningsElement.innerHTML = '';
+        for (let level = 1; level <= 7; level++) {
+            const earnings = stats.earningsByLevel[level] || 0;
+            levelsEarningsElement.innerHTML += `
+                <div class="flex justify-between items-center p-2 border-b border-gray-200">
+                    <span class="text-gray-700">Level ${level}:</span>
+                    <span class="font-bold text-green-600">${earnings} coins</span>
+                </div>
+            `;
+        }
+    }
+}
+
+// ✅ Display Referral Network
+function displayReferralNetwork(network) {
+    const networkContainer = document.getElementById('referralNetwork');
+    if (!networkContainer) return;
+    
+    networkContainer.innerHTML = '';
+    
+    for (let level = 1; level <= 7; level++) {
+        const levelData = network[level] || [];
+        
+        const levelHTML = `
+            <div class="bg-white rounded-xl shadow-md p-4 mb-4">
+                <h4 class="font-bold text-lg text-gray-800 mb-3">Level ${level} (${levelData.length} users)</h4>
+                <div class="space-y-2">
+                    ${levelData.map(user => `
+                        <div class="flex justify-between items-center p-2 rounded-lg ${user.isActive ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}">
+                            <div>
+                                <span class="font-medium text-gray-700">${user.invitee.email || 'User'}</span>
+                                <span class="text-xs ml-2 ${user.isActive ? 'text-green-600' : 'text-gray-500'}">
+                                    ${user.isActive ? '🟢 Active Today' : '⚫ Inactive'}
+                                </span>
+                            </div>
+                            <span class="text-sm text-gray-600">${user.invitee.total_coins || 0} coins</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        
+        networkContainer.innerHTML += levelHTML;
+    }
+}
+
+// ✅ Initialize Referral System on Page Load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔗 Referral system initialized');
+    
+    // URL se referral code handle karein
+    handleReferralFromURL();
+    
+    // Agar referral page pe hain to data load karein
+    if (window.location.pathname.includes('referral.html')) {
+        loadReferralPage();
+        
+        // Copy button event listener
+        const copyButton = document.getElementById('copyReferralBtn');
+        if (copyButton) {
+            copyButton.addEventListener('click', copyReferralLink);
+        }
+    }
+});
