@@ -170,6 +170,7 @@
     <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="utils.js"></script>
     <script>
         // Initialize Supabase
         const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
@@ -282,12 +283,12 @@
 
                 if (userError) throw userError;
 
-                // Update money
+                // Update user balance
                 const { error: updateError } = await supabase
                     .from('users')
                     .update({
-                        total_balance: userData.total_balance + money,
-                        earned_balance: userData.earned_balance + money
+                        total_balance: (userData.total_balance || 0) + money,
+                        earned_balance: (userData.earned_balance || 0) + money
                     })
                     .eq('id', currentUser.id);
 
@@ -317,25 +318,12 @@
                 // Reload recent treasures
                 await loadRecentTreasures();
 
-                showNotification(`You found ₹${money.toFixed(2)}!`, 'success');
+                appUtils.showNotification(`You found ₹${money.toFixed(2)}!`, 'success');
 
             } catch (error) {
                 console.error('Treasure open error:', error);
-                showNotification('Failed to open treasure', 'error');
+                appUtils.showNotification('Failed to open treasure', 'error');
             }
-        }
-
-        function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
-                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-            }`;
-            notification.classList.remove('hidden');
-
-            setTimeout(() => {
-                notification.classList.add('hidden');
-            }, 3000);
         }
 
         // Initialize page
