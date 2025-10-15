@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks - Cryptra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .green-bg { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+        .green-card { 
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        }
+        .green-nav { background: rgba(16, 185, 129, 0.95); }
+        .task-completed {
+            opacity: 0.7;
+            background: #f0fdf4 !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen pb-20">
+    <!-- Header -->
+    <header class="green-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <a href="dashboard.html" class="text-white">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-bold">Complete Tasks</h1>
+                        <p class="text-green-100 text-sm">Earn ₹0.50 - ₹5.00 per task</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-white font-bold text-lg" id="todayEarnings">₹0.00</div>
+                    <div class="text-green-100 text-sm">Today</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tasks Section -->
+    <section class="p-4">
+        <div class="container mx-auto">
+            <div class="green-card rounded-2xl p-6 mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Available Tasks</h2>
+                <p class="text-gray-600 mb-6">Complete simple tasks and earn money instantly</p>
+
+                <div class="bg-green-50 rounded-2xl p-4 mb-6">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Money per task:</span>
+                        <span class="text-green-500 font-semibold">₹0.50 - ₹5.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Completed today:</span>
+                        <span id="completedToday" class="text-green-500 font-semibold">0/10</span>
+                    </div>
+                </div>
+
+                <!-- Tasks List -->
+                <div id="tasksList" class="space-y-4">
+                    <!-- Tasks will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Task Instructions -->
+            <div class="green-card rounded-2xl p-6 mb-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">How to Complete Tasks</h3>
+                <div class="space-y-3 text-gray-600">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-play-circle text-green-500 mt-1"></i>
+                        <div>
+                            <p class="font-semibold">Watch Videos</p>
+                            <p class="text-sm">Watch short video advertisements to earn money</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-search text-green-500 mt-1"></i>
+                        <div>
+                            <p class="font-semibold">Visit Websites</p>
+                            <p class="text-sm">Visit sponsored websites and stay for 30 seconds</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-download text-green-500 mt-1"></i>
+                        <div>
+                            <p class="font-semibold">Install Apps</p>
+                            <p class="text-sm">Install and open recommended applications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Task Earnings -->
+            <div class="green-card rounded-2xl p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Recent Task Earnings</h3>
+                <div id="recentTasks" class="space-y-3">
+                    <div class="text-center py-8">
+                        <i class="fas fa-history text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-400">No task earnings yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="green-nav fixed bottom-0 left-0 right-0 text-white py-3">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-5 gap-4">
+                <a href="dashboard.html" class="text-center text-white">
+                    <i class="fas fa-home text-xl mb-1"></i>
+                    <div class="text-xs">Home</div>
+                </a>
+                <a href="watch.html" class="text-center text-white">
+                    <i class="fas fa-rupee-sign text-xl mb-1"></i>
+                    <div class="text-xs">Earn</div>
+                </a>
+                <a href="tasks.html" class="text-center text-white">
+                    <i class="fas fa-tasks text-xl mb-1"></i>
+                    <div class="text-xs font-semibold">Tasks</div>
+                </a>
+                <a href="withdraw.html" class="text-center text-white">
+                    <i class="fas fa-wallet text-xl mb-1"></i>
+                    <div class="text-xs">Wallet</div>
+                </a>
+                <a href="profile.html" class="text-center text-white">
+                    <i class="fas fa-user text-xl mb-1"></i>
+                    <div class="text-xs">Profile</div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 m-4 max-w-md w-full">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-tasks text-2xl text-white"></i>
+                </div>
+                <h3 id="taskTitle" class="text-xl font-bold text-gray-800 mb-2">Task Title</h3>
+                <p id="taskDescription" class="text-gray-600 mb-4">Task description goes here</p>
+                <p class="text-green-500 font-bold text-lg mb-4">Reward: <span id="taskReward">₹0.00</span></p>
+                
+                <div id="taskContent" class="mb-4">
+                    <!-- Task specific content will be loaded here -->
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button 
+                        onclick="closeTaskModal()"
+                        class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-2xl font-semibold hover:bg-gray-400 transition-all duration-200"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onclick="completeCurrentTask()"
+                        id="completeTaskBtn"
+                        class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-2xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200"
+                    >
+                        Start Task
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+            <p class="text-gray-800 font-semibold">Processing Task...</p>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let todayTasks = [];
+        let currentTask = null;
+        let countdownInterval = null;
+
+        // Sample tasks data
+        const availableTasks = [
+            {
+                id: 1,
+                title: "Watch Video Ad",
+                description: "Watch a 30-second video advertisement",
+                reward: 0.50,
+                type: "video",
+                duration: 30,
+                completed: false
+            },
+            {
+                id: 2,
+                title: "Visit Website",
+                description: "Visit our partner website for 45 seconds",
+                reward: 0.75,
+                type: "website",
+                duration: 45,
+                completed: false
+            },
+            {
+                id: 3,
+                title: "Complete Survey",
+                description: "Answer a quick 5-question survey",
+                reward: 1.00,
+                type: "survey",
+                duration: 60,
+                completed: false
+            },
+            {
+                id: 4,
+                title: "Watch Tutorial",
+                description: "Watch a 2-minute product tutorial",
+                reward: 1.50,
+                type: "video",
+                duration: 120,
+                completed: false
+            },
+            {
+                id: 5,
+                title: "App Installation",
+                description: "Install and open recommended app",
+                reward: 2.00,
+                type: "install",
+                duration: 90,
+                completed: false
+            }
+        ];
+
+        async function loadTasksPage() {
+            try {
+                // Check authentication
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = session.user;
+                await loadTodayTasks();
+                await loadRecentTasks();
+                displayTasks();
+
+            } catch (error) {
+                console.error('Tasks page load error:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function loadTodayTasks() {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                
+                const { data, error } = await supabase
+                    .from('earnings')
+                    .select('amount, description')
+                    .eq('user_id', currentUser.id)
+                    .eq('type', 'task')
+                    .gte('created_at', today + 'T00:00:00')
+                    .lte('created_at', today + 'T23:59:59');
+
+                if (error) throw error;
+
+                todayTasks = data || [];
+                const totalToday = todayTasks.reduce((sum, task) => sum + task.amount, 0);
+                const completedToday = todayTasks.length;
+
+                document.getElementById('todayEarnings').textContent = `₹${totalToday.toFixed(2)}`;
+                document.getElementById('completedToday').textContent = `${completedToday}/10`;
+
+                // Mark completed tasks
+                todayTasks.forEach(task => {
+                    const taskIndex = availableTasks.findIndex(t => 
+                        task.description.includes(t.title)
+                    );
+                    if (taskIndex !== -1) {
+                        availableTasks[taskIndex].completed = true;
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error loading today tasks:', error);
+            }
+        }
+
+        async function loadRecentTasks() {
+            try {
+                const { data, error } = await supabase
+                    .from('earnings')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('type', 'task')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                const container = document.getElementById('recentTasks');
+                
+                if (data && data.length > 0) {
+                    container.innerHTML = data.map(task => `
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i class="fas fa-tasks text-green-500 text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">${task.description}</div>
+                                    <div class="text-xs text-gray-500">${new Date(task.created_at).toLocaleTimeString()}</div>
+                                </div>
+                            </div>
+                            <div class="text-green-500 font-bold">+₹${task.amount.toFixed(2)}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading recent tasks:', error);
+            }
+        }
+
+        function displayTasks() {
+            const container = document.getElementById('tasksList');
+            container.innerHTML = '';
+
+            availableTasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = `bg-green-50 rounded-2xl p-4 hover:shadow-md transition-all duration-300 ${task.completed ? 'task-completed' : 'cursor-pointer'}`;
+                taskElement.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-800">${task.title}</h4>
+                            <p class="text-sm text-gray-600 mt-1">${task.description}</p>
+                            <div class="flex items-center space-x-4 mt-2">
+                                <span class="text-xs text-gray-500">
+                                    <i class="fas fa-clock mr-1"></i>${task.duration}s
+                                </span>
+                                <span class="text-green-500 font-bold">₹${task.reward.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            ${task.completed ? 
+                                '<span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">Completed</span>' :
+                                '<button onclick="openTaskModal(' + task.id + ')" class="bg-green-500 text-white px-4 py-2 rounded-2xl text-sm font-semibold hover:bg-green-600 transition-colors">Start</button>'
+                            }
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(taskElement);
+            });
+        }
+
+        function openTaskModal(taskId) {
+            currentTask = availableTasks.find(task => task.id === taskId);
+            if (!currentTask) return;
+
+            document.getElementById('taskTitle').textContent = currentTask.title;
+            document.getElementById('taskDescription').textContent = currentTask.description;
+            document.getElementById('taskReward').textContent = `₹${currentTask.reward.toFixed(2)}`;
+
+            // Load task-specific content
+            const taskContent = document.getElementById('taskContent');
+            switch(currentTask.type) {
+                case 'video':
+                    taskContent.innerHTML = `
+                        <div class="bg-gray-100 rounded-2xl p-4 text-center">
+                            <i class="fas fa-play-circle text-4xl text-green-500 mb-2"></i>
+                            <p class="text-sm text-gray-600">Watch the video for ${currentTask.duration} seconds</p>
+                        </div>
+                    `;
+                    break;
+                case 'website':
+                    taskContent.innerHTML = `
+                        <div class="bg-gray-100 rounded-2xl p-4 text-center">
+                            <i class="fas fa-globe text-4xl text-green-500 mb-2"></i>
+                            <p class="text-sm text-gray-600">Visit website for ${currentTask.duration} seconds</p>
+                        </div>
+                    `;
+                    break;
+                case 'survey':
+                    taskContent.innerHTML = `
+                        <div class="bg-gray-100 rounded-2xl p-4 text-center">
+                            <i class="fas fa-clipboard-list text-4xl text-green-500 mb-2"></i>
+                            <p class="text-sm text-gray-600">Complete quick survey</p>
+                        </div>
+                    `;
+                    break;
+                case 'install':
+                    taskContent.innerHTML = `
+                        <div class="bg-gray-100 rounded-2xl p-4 text-center">
+                            <i class="fas fa-download text-4xl text-green-500 mb-2"></i>
+                            <p class="text-sm text-gray-600">Install and open the app</p>
+                        </div>
+                    `;
+                    break;
+            }
+
+            document.getElementById('taskModal').classList.remove('hidden');
+        }
+
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.add('hidden');
+            currentTask = null;
+        }
+
+        function completeCurrentTask() {
+            if (!currentTask) return;
+
+            const completeBtn = document.getElementById('completeTaskBtn');
+            completeBtn.disabled = true;
+            completeBtn.textContent = 'Starting...';
+
+            // Simulate task completion process
+            setTimeout(() => {
+                processTaskCompletion();
+            }, 1000);
+        }
+
+        async function processTaskCompletion() {
+            try {
+                document.getElementById('loadingOverlay').classList.remove('hidden');
+
+                // Get user data
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (userError) throw userError;
+
+                // Update money
+                const { error: updateError } = await supabase
+                    .from('users')
+                    .update({
+                        total_balance: userData.total_balance + currentTask.reward,
+                        earned_balance: userData.earned_balance + currentTask.reward
+                    })
+                    .eq('id', currentUser.id);
+
+                if (updateError) throw updateError;
+
+                // Add earning record
+                const { error: earningError } = await supabase
+                    .from('earnings')
+                    .insert({
+                        user_id: currentUser.id,
+                        type: 'task',
+                        amount: currentTask.reward,
+                        description: currentTask.title
+                    });
+
+                if (earningError) throw earningError;
+
+                // Close modal and show success
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('taskModal').classList.add('hidden');
+                
+                showNotification(`Task completed! +₹${currentTask.reward.toFixed(2)} earned`, 'success');
+
+                // Reload data
+                await loadTodayTasks();
+                await loadRecentTasks();
+                displayTasks();
+
+                currentTask = null;
+
+            } catch (error) {
+                console.error('Task completion error:', error);
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                showNotification('Failed to complete task', 'error');
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.classList.remove('hidden');
+
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', loadTasksPage);
+    </script>
+</body>
+</html>
