@@ -1,52 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="google-adsense-account" content="ca-pub-3409420643457036">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Earnzy</title>
+    <title>Dashboard - Cryptra</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         * { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .premium-card { 
-            background: rgba(255, 255, 255, 0.1);
+        .green-bg { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+        .green-card { 
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
         }
-        .flutter-card {
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .flutter-button {
-            border-radius: 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 600;
-        }
-        .flutter-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
+        .green-nav { background: rgba(16, 185, 129, 0.95); }
     </style>
 </head>
-<body class="gradient-bg min-h-screen pb-20">
+<body class="bg-gray-50 min-h-screen pb-20">
     <!-- Header -->
-    <header class="bg-white/10 backdrop-blur-lg border-b border-white/20">
+    <header class="green-bg text-white shadow-lg">
         <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-yellow-400 rounded-2xl flex items-center justify-center">
-                        <i class="fas fa-coins text-gray-800"></i>
+                    <div class="w-10 h-10 bg-white rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-wallet text-green-500"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold text-white">Earnzy</h1>
-                        <p class="text-gray-200 text-sm" id="userName">Loading...</p>
+                        <h1 class="text-xl font-bold">Cryptra</h1>
+                        <p class="text-green-100 text-sm" id="userName">Loading...</p>
                     </div>
                 </div>
-                <button onclick="signOut()" class="bg-white/20 text-white px-4 py-2 rounded-2xl hover:bg-white/30 transition-all duration-200 flutter-button">
+                <button onclick="signOut()" class="bg-white/20 text-white px-4 py-2 rounded-2xl hover:bg-white/30 transition-all duration-200">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -56,27 +43,21 @@
     <!-- Wallet Summary -->
     <section class="p-4">
         <div class="container mx-auto">
-            <div class="premium-card rounded-3xl p-6 text-white mb-6 flutter-card">
-                <h2 class="text-2xl font-bold mb-4">Your Wallet</h2>
-                <div class="grid grid-cols-2 gap-4">
+            <div class="green-card rounded-2xl p-6 mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Your Wallet</h2>
+                <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="text-center">
-                        <div class="text-3xl font-bold text-yellow-300" id="totalCoins">0</div>
-                        <div class="text-gray-300 text-sm">Total Coins</div>
+                        <div class="text-2xl font-bold text-green-500" id="totalBalance">₹0.00</div>
+                        <div class="text-gray-600 text-sm">Total Balance</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-3xl font-bold text-green-300" id="earnedCoins">0</div>
-                        <div class="text-gray-300 text-sm">Earned</div>
+                        <div class="text-2xl font-bold text-blue-500" id="earnedBalance">₹0.00</div>
+                        <div class="text-gray-600 text-sm">Total Earned</div>
                     </div>
                 </div>
-                <div class="mt-4 pt-4 border-t border-white/20">
-                    <div class="flex justify-between text-sm">
-                        <span>Withdrawn:</span>
-                        <span id="withdrawnCoins">0 coins</span>
-                    </div>
-                    <div class="flex justify-between text-sm mt-2">
-                        <span>Available Balance:</span>
-                        <span id="availableBalance">0 coins</span>
-                    </div>
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Withdrawn:</span>
+                    <span id="withdrawnBalance">₹0.00</span>
                 </div>
             </div>
         </div>
@@ -85,15 +66,15 @@
     <!-- Quick Actions -->
     <section class="p-4">
         <div class="container mx-auto">
-            <h2 class="text-xl font-bold text-white mb-4">Quick Actions</h2>
+            <h2 class="text-lg font-bold text-gray-800 mb-4">Quick Actions</h2>
             <div class="grid grid-cols-2 gap-4">
-                <a href="withdraw.html" class="premium-card rounded-2xl p-4 text-center text-white hover:transform hover:scale-105 transition-all duration-300 flutter-card">
-                    <i class="fas fa-wallet text-2xl text-yellow-400 mb-2"></i>
-                    <div class="font-semibold">Withdraw</div>
+                <a href="withdraw.html" class="green-card rounded-2xl p-4 text-center hover:shadow-md transition-all duration-300">
+                    <i class="fas fa-rupee-sign text-2xl text-green-500 mb-2"></i>
+                    <div class="font-semibold text-gray-800">Withdraw</div>
                 </a>
-                <a href="referral.html" class="premium-card rounded-2xl p-4 text-center text-white hover:transform hover:scale-105 transition-all duration-300 flutter-card">
-                    <i class="fas fa-user-friends text-2xl text-yellow-400 mb-2"></i>
-                    <div class="font-semibold">Refer & Earn</div>
+                <a href="referral.html" class="green-card rounded-2xl p-4 text-center hover:shadow-md transition-all duration-300">
+                    <i class="fas fa-user-friends text-2xl text-green-500 mb-2"></i>
+                    <div class="font-semibold text-gray-800">Refer & Earn</div>
                 </a>
             </div>
         </div>
@@ -102,49 +83,71 @@
     <!-- Earning Methods -->
     <section class="p-4">
         <div class="container mx-auto">
-            <h2 class="text-xl font-bold text-white mb-4">Earning Methods</h2>
+            <h2 class="text-lg font-bold text-gray-800 mb-4">Earning Methods</h2>
             <div class="grid grid-cols-2 gap-4">
-                <a href="watch.html" class="premium-card rounded-2xl p-4 text-white hover:transform hover:scale-105 transition-all duration-300 flutter-card">
+                <a href="watch.html" class="green-card rounded-2xl p-4 hover:shadow-md transition-all duration-300">
                     <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center">
-                            <i class="fas fa-tv text-white"></i>
+                        <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-play text-green-500"></i>
                         </div>
                         <div>
-                            <div class="font-semibold">Watch Ads</div>
-                            <div class="text-xs text-gray-300">10-20 coins</div>
+                            <div class="font-semibold text-gray-800">Watch Videos</div>
+                            <div class="text-xs text-gray-600">₹0.10 - ₹0.20</div>
                         </div>
                     </div>
                 </a>
-                <a href="scratch.html" class="premium-card rounded-2xl p-4 text-white hover:transform hover:scale-105 transition-all duration-300 flutter-card">
+                <a href="scratch.html" class="green-card rounded-2xl p-4 hover:shadow-md transition-all duration-300">
                     <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center">
-                            <i class="fas fa-scroll text-white"></i>
+                        <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-scroll text-green-500"></i>
                         </div>
                         <div>
-                            <div class="font-semibold">Scratch Cards</div>
-                            <div class="text-xs text-gray-300">5-50 coins</div>
+                            <div class="font-semibold text-gray-800">Scratch Cards</div>
+                            <div class="text-xs text-gray-600">₹0.05 - ₹0.50</div>
                         </div>
                     </div>
                 </a>
-                <a href="checkin.html" class="premium-card rounded-2xl p-4 text-white hover:transform hover:scale-105 transition-all duration-300 flutter-card">
+                <a href="checkin.html" class="green-card rounded-2xl p-4 hover:shadow-md transition-all duration-300">
                     <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center">
-                            <i class="fas fa-calendar-check text-white"></i>
+                        <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-calendar-check text-green-500"></i>
                         </div>
                         <div>
-                            <div class="font-semibold">Daily Check-in</div>
-                            <div class="text-xs text-gray-300">10-100 coins</div>
+                            <div class="font-semibold text-gray-800">Daily Check-in</div>
+                            <div class="text-xs text-gray-600">₹0.10 - ₹1.00</div>
                         </div>
                     </div>
                 </a>
-                <a href="treasure.html" class="premium-card rounded-2xl p-4 text-white hover:transform hover:scale-105 transition-all duration-300 flutter-card">
+                <a href="treasure.html" class="green-card rounded-2xl p-4 hover:shadow-md transition-all duration-300">
                     <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center">
-                            <i class="fas fa-gem text-white"></i>
+                        <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-gem text-green-500"></i>
                         </div>
                         <div>
-                            <div class="font-semibold">Treasure Box</div>
-                            <div class="text-xs text-gray-300">20-200 coins</div>
+                            <div class="font-semibold text-gray-800">Treasure Box</div>
+                            <div class="text-xs text-gray-600">₹0.20 - ₹2.00</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="tasks.html" class="green-card rounded-2xl p-4 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-tasks text-green-500"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-gray-800">Complete Tasks</div>
+                            <div class="text-xs text-gray-600">₹0.50 - ₹5.00</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="referral.html" class="green-card rounded-2xl p-4 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-users text-green-500"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-gray-800">Refer Friends</div>
+                            <div class="text-xs text-gray-600">7-Level System</div>
                         </div>
                     </div>
                 </a>
@@ -155,9 +158,9 @@
     <!-- Recent Activity -->
     <section class="p-4">
         <div class="container mx-auto">
-            <h2 class="text-xl font-bold text-white mb-4">Recent Activity</h2>
-            <div class="premium-card rounded-2xl p-4 flutter-card">
-                <div id="recentActivity" class="text-white">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">Recent Activity</h2>
+            <div class="green-card rounded-2xl p-4">
+                <div id="recentActivity" class="text-gray-800">
                     <div class="text-center py-8">
                         <i class="fas fa-history text-3xl text-gray-400 mb-2"></i>
                         <p class="text-gray-400">No recent activity</p>
@@ -168,22 +171,26 @@
     </section>
 
     <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-lg border-t border-white/20">
-        <div class="container mx-auto px-4 py-3">
-            <div class="grid grid-cols-4 gap-4">
-                <a href="dashboard.html" class="text-center text-yellow-400">
+    <nav class="green-nav fixed bottom-0 left-0 right-0 text-white py-3">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-5 gap-4">
+                <a href="dashboard.html" class="text-center text-white">
                     <i class="fas fa-home text-xl mb-1"></i>
                     <div class="text-xs font-semibold">Home</div>
                 </a>
-                <a href="watch.html" class="text-center text-white hover:text-yellow-400 transition-colors">
-                    <i class="fas fa-coins text-xl mb-1"></i>
+                <a href="watch.html" class="text-center text-white">
+                    <i class="fas fa-rupee-sign text-xl mb-1"></i>
                     <div class="text-xs">Earn</div>
                 </a>
-                <a href="withdraw.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                <a href="tasks.html" class="text-center text-white">
+                    <i class="fas fa-tasks text-xl mb-1"></i>
+                    <div class="text-xs">Tasks</div>
+                </a>
+                <a href="withdraw.html" class="text-center text-white">
                     <i class="fas fa-wallet text-xl mb-1"></i>
                     <div class="text-xs">Wallet</div>
                 </a>
-                <a href="profile.html" class="text-center text-white hover:text-yellow-400 transition-colors">
+                <a href="profile.html" class="text-center text-white">
                     <i class="fas fa-user text-xl mb-1"></i>
                     <div class="text-xs">Profile</div>
                 </a>
@@ -193,36 +200,34 @@
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-2xl p-6 text-center flutter-card">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
+        <div class="bg-white rounded-2xl p-6 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
             <p class="text-gray-800 font-semibold">Loading wallet data...</p>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Initialize Supabase - FIXED
+        // Initialize Supabase
         const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Enhanced dashboard loading - FIXED
         async function loadDashboard() {
             try {
-                console.log('🚀 Loading dashboard...');
+                // Show loading
                 document.getElementById('loadingOverlay').classList.remove('hidden');
 
-                // Enhanced authentication check
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-                if (sessionError || !session) {
-                    console.log('❌ No session, redirecting to login');
+                // Check authentication
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
                     window.location.href = 'login.html';
                     return;
                 }
 
-                console.log('✅ Session found:', session.user.id);
+                console.log('Session found:', session.user.id);
 
-                // Load user data with enhanced error handling
+                // Load user data with error handling
                 const { data: user, error } = await supabase
                     .from('users')
                     .select('*')
@@ -230,86 +235,48 @@
                     .single();
 
                 if (error) {
-                    console.error('❌ User data error:', error);
-                    // Create user profile if doesn't exist
-                    await createUserProfile(session.user);
-                    return;
+                    console.error('Error loading user data:', error);
+                    throw error;
                 }
 
-                console.log('✅ User data loaded:', user);
+                console.log('User data loaded:', user);
 
-                // Update UI with actual data - FIXED
-                document.getElementById('userName').textContent = user.name || user.email || 'User';
-                document.getElementById('totalCoins').textContent = user.total_coins || 0;
-                document.getElementById('earnedCoins').textContent = user.earned_coins || 0;
-                document.getElementById('withdrawnCoins').textContent = (user.withdrawn_coins || 0) + ' coins';
-                document.getElementById('availableBalance').textContent = (user.total_coins || 0) + ' coins';
+                // Update UI with actual data
+                document.getElementById('userName').textContent = user.email || 'User';
+                document.getElementById('totalBalance').textContent = `₹${(user.total_balance || 0).toFixed(2)}`;
+                document.getElementById('earnedBalance').textContent = `₹${(user.earned_balance || 0).toFixed(2)}`;
+                document.getElementById('withdrawnBalance').textContent = `₹${(user.withdrawn_balance || 0).toFixed(2)}`;
 
                 // Load recent activity
                 await loadRecentActivity(session.user.id);
 
             } catch (error) {
-                console.error('❌ Dashboard load error:', error);
+                console.error('Dashboard load error:', error);
                 
                 // Show error state but don't redirect
                 document.getElementById('userName').textContent = 'Error loading data';
-                document.getElementById('totalCoins').textContent = '0';
-                document.getElementById('earnedCoins').textContent = '0';
-                document.getElementById('withdrawnCoins').textContent = '0 coins';
-                document.getElementById('availableBalance').textContent = '0 coins';
+                document.getElementById('totalBalance').textContent = '₹0.00';
+                document.getElementById('earnedBalance').textContent = '₹0.00';
+                document.getElementById('withdrawnBalance').textContent = '₹0.00';
                 
                 // Show error in activity section
                 document.getElementById('recentActivity').innerHTML = `
                     <div class="text-center py-8 text-red-400">
                         <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
                         <p>Failed to load data</p>
-                        <button onclick="loadDashboard()" class="mt-4 bg-yellow-400 text-gray-800 px-4 py-2 rounded-2xl font-semibold flutter-button">
+                        <button onclick="loadDashboard()" class="mt-4 bg-green-500 text-white px-4 py-2 rounded-2xl font-semibold">
                             Retry
                         </button>
                     </div>
                 `;
             } finally {
+                // Hide loading
                 document.getElementById('loadingOverlay').classList.add('hidden');
-            }
-        }
-
-        // Create user profile if doesn't exist - ADDED
-        async function createUserProfile(authUser) {
-            try {
-                console.log('👤 Creating user profile...');
-                const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                
-                const { error } = await supabase
-                    .from('users')
-                    .insert({
-                        id: authUser.id,
-                        email: authUser.email,
-                        name: authUser.user_metadata?.name || authUser.email.split('@')[0],
-                        referral_code: referralCode,
-                        total_coins: 0,
-                        earned_coins: 0,
-                        withdrawn_coins: 0,
-                        daily_streak: 0,
-                        last_checkin: null
-                    });
-
-                if (error) {
-                    console.error('❌ Profile creation error:', error);
-                    throw error;
-                }
-
-                console.log('✅ User profile created');
-                // Reload dashboard
-                await loadDashboard();
-                
-            } catch (error) {
-                console.error('❌ Failed to create user profile:', error);
             }
         }
 
         async function loadRecentActivity(userId) {
             try {
-                console.log('📊 Loading recent activity...');
                 const { data: earnings, error } = await supabase
                     .from('earnings')
                     .select('*')
@@ -322,41 +289,31 @@
                 const activityContainer = document.getElementById('recentActivity');
                 
                 if (earnings && earnings.length > 0) {
-                    activityContainer.innerHTML = earnings.map(earning => {
-                        let levelText = '';
-                        if (earning.level) {
-                            levelText = `<span class="text-xs bg-blue-500 px-2 py-1 rounded-full ml-2">Level ${earning.level}</span>`;
-                        }
-                        
-                        return `
-                            <div class="flex justify-between items-center py-3 border-b border-white/10 last:border-b-0">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                                        <i class="fas fa-${getEarningIcon(earning.type)} text-yellow-400 text-sm"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-semibold capitalize flex items-center">
-                                            ${earning.type}
-                                            ${levelText}
-                                        </div>
-                                        <div class="text-xs text-gray-300">${new Date(earning.created_at).toLocaleDateString()}</div>
-                                    </div>
+                    activityContainer.innerHTML = earnings.map(earning => `
+                        <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i class="fas fa-${getEarningIcon(earning.type)} text-green-500 text-sm"></i>
                                 </div>
-                                <div class="text-green-400 font-bold">+${earning.coins}</div>
+                                <div>
+                                    <div class="font-semibold capitalize">${earning.type}</div>
+                                    <div class="text-xs text-gray-500">${new Date(earning.created_at).toLocaleDateString()}</div>
+                                </div>
                             </div>
-                        `;
-                    }).join('');
+                            <div class="text-green-500 font-bold">+₹${earning.amount.toFixed(2)}</div>
+                        </div>
+                    `).join('');
                 } else {
                     activityContainer.innerHTML = `
                         <div class="text-center py-8">
                             <i class="fas fa-history text-3xl text-gray-400 mb-2"></i>
                             <p class="text-gray-400">No recent activity</p>
-                            <p class="text-gray-300 text-sm mt-2">Complete tasks to see your earnings here</p>
+                            <p class="text-gray-500 text-sm mt-2">Complete tasks to see your earnings here</p>
                         </div>
                     `;
                 }
             } catch (error) {
-                console.error('❌ Activity load error:', error);
+                console.error('Activity load error:', error);
                 document.getElementById('recentActivity').innerHTML = `
                     <div class="text-center py-8 text-gray-400">
                         <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
@@ -368,16 +325,15 @@
 
         function getEarningIcon(type) {
             const icons = {
-                watch: 'tv',
+                watch: 'play',
                 scratch: 'scroll',
                 checkin: 'calendar-check',
                 treasure: 'gem',
                 referral: 'user-friends',
-                commission: 'money-bill-wave',
                 task: 'tasks',
                 admin_adjustment: 'cog'
             };
-            return icons[type] || 'coins';
+            return icons[type] || 'rupee-sign';
         }
 
         async function signOut() {
@@ -388,7 +344,7 @@
                     window.location.href = 'login.html';
                 }
             } catch (error) {
-                console.error('❌ Sign out error:', error);
+                console.error('Sign out error:', error);
                 document.getElementById('loadingOverlay').classList.add('hidden');
             }
         }
@@ -400,9 +356,8 @@
             }
         });
 
-        // Initialize dashboard - FIXED
+        // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🏠 Dashboard initialized');
             loadDashboard();
             
             // Auto-refresh every 30 seconds
