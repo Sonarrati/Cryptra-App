@@ -21,11 +21,18 @@
             background: linear-gradient(45deg, #10b981, #059669, #047857, #065f46);
             background-size: 400% 400%;
             animation: gradientShift 3s ease infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
+        }
+        .scratch-card.scratched {
+            background: #6b7280;
+            animation: none;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -146,6 +153,7 @@
     <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="utils.js"></script>
     <script>
         // Initialize Supabase
         const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
@@ -244,7 +252,7 @@
 
             for (let i = 0; i < 3; i++) {
                 const card = document.createElement('div');
-                card.className = `scratch-card rounded-2xl aspect-square flex items-center justify-center cursor-pointer transform hover:scale-105 transition-all duration-300 ${i >= availableCards ? 'opacity-50 cursor-not-allowed' : ''}`;
+                card.className = `scratch-card rounded-2xl aspect-square flex items-center justify-center cursor-pointer transform hover:scale-105 transition-all duration-300 ${i >= availableCards ? 'opacity-50 cursor-not-allowed scratched' : ''}`;
                 card.innerHTML = `
                     <div class="text-center">
                         <i class="fas fa-question text-2xl text-white mb-2"></i>
@@ -264,14 +272,14 @@
             try {
                 // Check daily limit
                 if (todayEarnings.length >= 3) {
-                    showNotification('Daily limit reached (3 cards)', 'error');
+                    appUtils.showNotification('Daily limit reached (3 cards)', 'error');
                     return;
                 }
 
                 // Generate random money between ₹0.05-₹0.50
                 const money = (Math.random() * 0.45) + 0.05;
 
-                // Update money in database
+                // Get user data
                 const { data: userData, error: userError } = await supabase
                     .from('users')
                     .select('*')
@@ -280,11 +288,12 @@
 
                 if (userError) throw userError;
 
+                // Update user balance
                 const { error: updateError } = await supabase
                     .from('users')
                     .update({
-                        total_balance: userData.total_balance + money,
-                        earned_balance: userData.earned_balance + money
+                        total_balance: (userData.total_balance || 0) + money,
+                        earned_balance: (userData.earned_balance || 0) + money
                     })
                     .eq('id', currentUser.id);
 
@@ -302,6 +311,16 @@
 
                 if (earningError) throw earningError;
 
+                // Mark card as scratched
+                const cards = document.querySelectorAll('.scratch-card');
+                cards[cardIndex].classList.add('scratched');
+                cards[cardIndex].innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-rupee-sign text-2xl text-white mb-2"></i>
+                        <div class="text-white font-bold text-lg">₹${money.toFixed(2)}</div>
+                    </div>
+                `;
+
                 // Show result
                 document.getElementById('wonMoney').textContent = `₹${money.toFixed(2)}`;
                 document.getElementById('resultDisplay').classList.remove('hidden');
@@ -310,32 +329,19 @@
                 // Update UI
                 await loadTodayEarnings();
                 await loadRecentWinnings();
-                generateCards();
 
-                showNotification(`You won ₹${money.toFixed(2)}!`, 'success');
+                appUtils.showNotification(`You won ₹${money.toFixed(2)}!`, 'success');
 
             } catch (error) {
                 console.error('Scratch card error:', error);
-                showNotification('Failed to process scratch card', 'error');
+                appUtils.showNotification('Failed to process scratch card', 'error');
             }
         }
 
         function resetCards() {
             document.getElementById('resultDisplay').classList.add('hidden');
             document.getElementById('resetButton').classList.add('hidden');
-        }
-
-        function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
-                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-            }`;
-            notification.classList.remove('hidden');
-
-            setTimeout(() => {
-                notification.classList.add('hidden');
-            }, 3000);
+            generateCards();
         }
 
         // Initialize page
