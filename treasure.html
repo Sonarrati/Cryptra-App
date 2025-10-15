@@ -18,24 +18,23 @@
         }
         .green-nav { background: rgba(16, 185, 129, 0.95); }
         .treasure-box {
-            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #10b981, #059669);
             cursor: pointer;
+            transition: all 0.3s ease;
+            animation: glow 2s infinite;
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px #10b981; }
+            50% { box-shadow: 0 0 20px #10b981; }
+            100% { box-shadow: 0 0 5px #10b981; }
         }
         .treasure-box:hover {
             transform: scale(1.05);
         }
         .treasure-box.opened {
-            transform: scale(0.95);
-            opacity: 0.7;
+            background: #6b7280;
+            animation: none;
             cursor: not-allowed;
-        }
-        @keyframes glow {
-            0% { box-shadow: 0 0 5px #10b981; }
-            50% { box-shadow: 0 0 20px #10b981, 0 0 30px #059669; }
-            100% { box-shadow: 0 0 5px #10b981; }
-        }
-        .glowing {
-            animation: glow 2s infinite;
         }
     </style>
 </head>
@@ -82,27 +81,12 @@
                     </div>
                 </div>
 
-                <!-- Treasure Boxes Grid -->
-                <div class="grid grid-cols-3 gap-4 mb-6" id="treasureGrid">
-                    <!-- Box 1 -->
-                    <div class="treasure-box glowing bg-green-500 rounded-2xl aspect-square flex items-center justify-center" onclick="openTreasure(0)">
+                <!-- Single Treasure Box -->
+                <div class="mb-6">
+                    <div class="treasure-box rounded-2xl aspect-square flex items-center justify-center mx-auto max-w-xs" onclick="openTreasure()" id="treasureBox">
                         <div class="text-center">
-                            <i class="fas fa-gem text-2xl text-white mb-2"></i>
-                            <div class="text-white font-semibold">Box 1</div>
-                        </div>
-                    </div>
-                    <!-- Box 2 -->
-                    <div class="treasure-box glowing bg-green-500 rounded-2xl aspect-square flex items-center justify-center" onclick="openTreasure(1)">
-                        <div class="text-center">
-                            <i class="fas fa-gem text-2xl text-white mb-2"></i>
-                            <div class="text-white font-semibold">Box 2</div>
-                        </div>
-                    </div>
-                    <!-- Box 3 -->
-                    <div class="treasure-box glowing bg-green-500 rounded-2xl aspect-square flex items-center justify-center" onclick="openTreasure(2)">
-                        <div class="text-center">
-                            <i class="fas fa-gem text-2xl text-white mb-2"></i>
-                            <div class="text-white font-semibold">Box 3</div>
+                            <i class="fas fa-gem text-4xl text-white mb-2"></i>
+                            <div class="text-white font-semibold text-xl">Click to Open</div>
                         </div>
                     </div>
                 </div>
@@ -170,7 +154,6 @@
     <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="utils.js"></script>
     <script>
         // Initialize Supabase
         const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
@@ -217,7 +200,7 @@
 
                 if (todayOpened) {
                     document.getElementById('todayStatus').textContent = 'Opened';
-                    document.getElementById('treasureGrid').classList.add('hidden');
+                    document.getElementById('treasureBox').classList.add('opened');
                     document.getElementById('alreadyOpened').classList.remove('hidden');
                     
                     // Show what was earned today
@@ -267,7 +250,7 @@
             }
         }
 
-        async function openTreasure(boxIndex) {
+        async function openTreasure() {
             if (todayOpened) return;
 
             try {
@@ -287,8 +270,8 @@
                 const { error: updateError } = await supabase
                     .from('users')
                     .update({
-                        total_balance: (userData.total_balance || 0) + money,
-                        earned_balance: (userData.earned_balance || 0) + money
+                        total_balance: (parseFloat(userData.total_balance) || 0) + money,
+                        earned_balance: (parseFloat(userData.earned_balance) || 0) + money
                     })
                     .eq('id', currentUser.id);
 
@@ -309,7 +292,7 @@
                 // Show result
                 document.getElementById('foundMoney').textContent = `₹${money.toFixed(2)}`;
                 document.getElementById('resultDisplay').classList.remove('hidden');
-                document.getElementById('treasureGrid').classList.add('hidden');
+                document.getElementById('treasureBox').classList.add('opened');
 
                 // Update status
                 document.getElementById('todayStatus').textContent = 'Opened';
@@ -318,12 +301,25 @@
                 // Reload recent treasures
                 await loadRecentTreasures();
 
-                appUtils.showNotification(`You found ₹${money.toFixed(2)}!`, 'success');
+                showNotification(`You found ₹${money.toFixed(2)}!`, 'success');
 
             } catch (error) {
                 console.error('Treasure open error:', error);
-                appUtils.showNotification('Failed to open treasure', 'error');
+                showNotification('Failed to open treasure', 'error');
             }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.classList.remove('hidden');
+
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
         }
 
         // Initialize page
