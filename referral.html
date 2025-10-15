@@ -23,32 +23,6 @@
         .level-card:hover {
             transform: translateY(-2px);
         }
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-        .active-badge {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-        .inactive-badge {
-            background: #6b7280;
-            color: white;
-        }
-        .commission-bar {
-            height: 6px;
-            background: #e5e7eb;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        .commission-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #10b981, #059669);
-            transition: width 0.5s ease;
-        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen pb-20">
@@ -76,16 +50,6 @@
     <!-- Referral System -->
     <section class="p-4">
         <div class="container mx-auto">
-            <!-- Today's Commission -->
-            <div class="green-card rounded-2xl p-6 mb-6 text-center pulse-animation">
-                <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-rupee-sign text-2xl text-white"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Today's Commission</h2>
-                <div class="text-3xl font-bold text-green-500 mb-2" id="todaysCommissions">₹0.00</div>
-                <p class="text-gray-600 text-sm">Updated in real-time</p>
-            </div>
-
             <!-- Referral Code & Link -->
             <div class="green-card rounded-2xl p-6 mb-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-4">Your Referral Tools</h3>
@@ -145,6 +109,13 @@
                 </div>
             </div>
 
+            <!-- Today's Commission -->
+            <div class="green-card rounded-2xl p-6 mb-6 text-center">
+                <h2 class="text-xl font-bold text-gray-800 mb-2">Today's Commission</h2>
+                <div class="text-3xl font-bold text-green-500 mb-2" id="todaysCommissions">₹0.00</div>
+                <p class="text-gray-600 text-sm">Updated in real-time</p>
+            </div>
+
             <!-- Active User Rule Info -->
             <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6">
                 <div class="flex items-start space-x-3">
@@ -161,167 +132,125 @@
 
             <!-- 7-Level Commission System -->
             <div class="green-card rounded-2xl p-6 mb-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">7-Level Commission System</h2>
+                <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">7-Level Referral System</h2>
                 
                 <div class="space-y-4">
                     <!-- Level 1 -->
-                    <div class="level-card bg-gradient-to-r from-green-50 to-green-100 rounded-2xl p-4 border border-green-200">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center">
-                                    <span class="text-white font-bold text-lg">1</span>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-gray-800">Level 1 - Direct Referrals</div>
-                                    <div class="text-sm text-gray-600">Your direct team members</div>
-                                </div>
+                    <div class="level-card bg-white border border-green-200 rounded-2xl p-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center">
+                                <span class="text-white font-bold text-lg">1</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-800">Level 1 - Direct Referrals</h3>
+                                <p class="text-sm text-gray-600">Your direct team members</p>
                             </div>
                             <div class="text-right">
                                 <div class="text-green-500 font-bold text-lg">4.5%</div>
-                                <div class="text-xs text-gray-500">of daily earnings</div>
+                                <div class="text-xs text-gray-500" id="level1Count">0 users</div>
                             </div>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-gray-600">Active: <span id="level1Active" class="font-semibold">0</span>/<span id="level1Total" class="font-semibold">0</span></span>
-                            <span class="text-green-500 font-semibold" id="level1Earnings">₹0.00</span>
                         </div>
                     </div>
 
                     <!-- Level 2 -->
-                    <div class="level-card bg-gradient-to-r from-green-100 to-green-200 rounded-2xl p-4 border border-green-300">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center">
-                                    <span class="text-white font-bold text-lg">2</span>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-gray-800">Level 2 - Team's Referrals</div>
-                                    <div class="text-sm text-gray-600">Referrals of your direct team</div>
-                                </div>
+                    <div class="level-card bg-white border border-green-200 rounded-2xl p-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center">
+                                <span class="text-white font-bold text-lg">2</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-800">Level 2 - Team's Referrals</h3>
+                                <p class="text-sm text-gray-600">Referrals of your direct team</p>
                             </div>
                             <div class="text-right">
                                 <div class="text-green-500 font-bold text-lg">2.5%</div>
-                                <div class="text-xs text-gray-500">of daily earnings</div>
+                                <div class="text-xs text-gray-500" id="level2Count">0 users</div>
                             </div>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-gray-600">Active: <span id="level2Active" class="font-semibold">0</span>/<span id="level2Total" class="font-semibold">0</span></span>
-                            <span class="text-green-500 font-semibold" id="level2Earnings">₹0.00</span>
                         </div>
                     </div>
 
                     <!-- Level 3 -->
-                    <div class="level-card bg-gradient-to-r from-green-200 to-green-300 rounded-2xl p-4 border border-green-400">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-green-700 rounded-2xl flex items-center justify-center">
-                                    <span class="text-white font-bold text-lg">3</span>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-gray-800">Level 3 - Extended Network</div>
-                                    <div class="text-sm text-gray-600">Third level from your team</div>
-                                </div>
+                    <div class="level-card bg-white border border-green-200 rounded-2xl p-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-green-700 rounded-2xl flex items-center justify-center">
+                                <span class="text-white font-bold text-lg">3</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-800">Level 3 - Extended Network</h3>
+                                <p class="text-sm text-gray-600">Third level from your team</p>
                             </div>
                             <div class="text-right">
                                 <div class="text-green-500 font-bold text-lg">1.5%</div>
-                                <div class="text-xs text-gray-500">of daily earnings</div>
+                                <div class="text-xs text-gray-500" id="level3Count">0 users</div>
                             </div>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-gray-600">Active: <span id="level3Active" class="font-semibold">0</span>/<span id="level3Total" class="font-semibold">0</span></span>
-                            <span class="text-green-500 font-semibold" id="level3Earnings">₹0.00</span>
                         </div>
                     </div>
 
                     <!-- Level 4 -->
-                    <div class="level-card bg-gradient-to-r from-green-300 to-green-400 rounded-2xl p-4 border border-green-500">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-green-800 rounded-2xl flex items-center justify-center">
-                                    <span class="text-white font-bold text-lg">4</span>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-gray-800">Level 4 - Growing Network</div>
-                                    <div class="text-sm text-gray-600">Fourth level from your team</div>
-                                </div>
+                    <div class="level-card bg-white border border-green-200 rounded-2xl p-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-green-800 rounded-2xl flex items-center justify-center">
+                                <span class="text-white font-bold text-lg">4</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-800">Level 4 - Growing Network</h3>
+                                <p class="text-sm text-gray-600">Fourth level from your team</p>
                             </div>
                             <div class="text-right">
                                 <div class="text-green-500 font-bold text-lg">0.8%</div>
-                                <div class="text-xs text-gray-500">of daily earnings</div>
+                                <div class="text-xs text-gray-500" id="level4Count">0 users</div>
                             </div>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-gray-600">Active: <span id="level4Active" class="font-semibold">0</span>/<span id="level4Total" class="font-semibold">0</span></span>
-                            <span class="text-green-500 font-semibold" id="level4Earnings">₹0.00</span>
                         </div>
                     </div>
 
                     <!-- Level 5 -->
-                    <div class="level-card bg-gradient-to-r from-green-400 to-green-500 rounded-2xl p-4 border border-green-600">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-green-900 rounded-2xl flex items-center justify-center">
-                                    <span class="text-white font-bold text-lg">5</span>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-gray-800">Level 5 - Deep Network</div>
-                                    <div class="text-sm text-gray-600">Fifth level from your team</div>
-                                </div>
+                    <div class="level-card bg-white border border-green-200 rounded-2xl p-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-green-900 rounded-2xl flex items-center justify-center">
+                                <span class="text-white font-bold text-lg">5</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-800">Level 5 - Deep Network</h3>
+                                <p class="text-sm text-gray-600">Fifth level from your team</p>
                             </div>
                             <div class="text-right">
                                 <div class="text-green-500 font-bold text-lg">0.3%</div>
-                                <div class="text-xs text-gray-500">of daily earnings</div>
+                                <div class="text-xs text-gray-500" id="level5Count">0 users</div>
                             </div>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-gray-600">Active: <span id="level5Active" class="font-semibold">0</span>/<span id="level5Total" class="font-semibold">0</span></span>
-                            <span class="text-green-500 font-semibold" id="level5Earnings">₹0.00</span>
                         </div>
                     </div>
 
                     <!-- Level 6 -->
-                    <div class="level-card bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-4 border border-green-700">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-green-800 rounded-2xl flex items-center justify-center">
-                                    <span class="text-white font-bold text-lg">6</span>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-gray-800">Level 6 - Extended Reach</div>
-                                    <div class="text-sm text-gray-600">Sixth level from your team</div>
-                                </div>
+                    <div class="level-card bg-white border border-green-200 rounded-2xl p-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-green-800 rounded-2xl flex items-center justify-center">
+                                <span class="text-white font-bold text-lg">6</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-800">Level 6 - Extended Reach</h3>
+                                <p class="text-sm text-gray-600">Sixth level from your team</p>
                             </div>
                             <div class="text-right">
                                 <div class="text-green-500 font-bold text-lg">0.1%</div>
-                                <div class="text-xs text-gray-500">of daily earnings</div>
+                                <div class="text-xs text-gray-500" id="level6Count">0 users</div>
                             </div>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-gray-600">Active: <span id="level6Active" class="font-semibold">0</span>/<span id="level6Total" class="font-semibold">0</span></span>
-                            <span class="text-green-500 font-semibold" id="level6Earnings">₹0.00</span>
                         </div>
                     </div>
 
                     <!-- Level 7 -->
-                    <div class="level-card bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-4 border border-green-800">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-green-900 rounded-2xl flex items-center justify-center">
-                                    <span class="text-white font-bold text-lg">7</span>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-gray-800">Level 7 - Maximum Depth</div>
-                                    <div class="text-sm text-gray-600">Seventh level from your team</div>
-                                </div>
+                    <div class="level-card bg-white border border-green-200 rounded-2xl p-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-green-900 rounded-2xl flex items-center justify-center">
+                                <span class="text-white font-bold text-lg">7</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-800">Level 7 - Maximum Depth</h3>
+                                <p class="text-sm text-gray-600">Seventh level from your team</p>
                             </div>
                             <div class="text-right">
                                 <div class="text-green-500 font-bold text-lg">0.05%</div>
-                                <div class="text-xs text-gray-500">of daily earnings</div>
+                                <div class="text-xs text-gray-500" id="level7Count">0 users</div>
                             </div>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-gray-600">Active: <span id="level7Active" class="font-semibold">0</span>/<span id="level7Total" class="font-semibold">0</span></span>
-                            <span class="text-green-500 font-semibold" id="level7Earnings">₹0.00</span>
                         </div>
                     </div>
                 </div>
@@ -405,7 +334,6 @@
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         let currentUser = null;
-        let referralManager = null;
 
         async function loadReferralPage() {
             try {
@@ -419,15 +347,6 @@
                 }
 
                 currentUser = session.user;
-                
-                // Initialize referral manager
-                if (window.improvedReferralManager) {
-                    referralManager = window.improvedReferralManager;
-                } else {
-                    console.error('Improved referral manager not found');
-                    return;
-                }
-
                 await loadReferralData();
                 await loadCommissionHistory();
 
@@ -469,29 +388,69 @@
 
         async function loadReferralStats() {
             try {
-                const stats = await referralManager.getReferralStats(currentUser.id);
-                
-                if (stats.error) throw stats.error;
+                // Get total referrals count by level
+                const { data: referrals, error } = await supabase
+                    .from('referrals')
+                    .select('level, invitee_id')
+                    .eq('inviter_id', currentUser.id);
 
-                // Update total statistics
-                document.getElementById('totalReferrals').textContent = stats.totalReferrals;
-                document.getElementById('activeReferrals').textContent = Object.values(stats.activeCounts).reduce((a, b) => a + b, 0);
-                document.getElementById('totalEarnings').textContent = `₹${stats.totalEarnings.toFixed(2)}`;
-                document.getElementById('todaysCommissions').textContent = `₹${stats.todaysEarnings.toFixed(2)}`;
+                if (error) throw error;
 
-                // Update level-wise statistics
-                for (let level = 1; level <= 7; level++) {
-                    const totalElement = document.getElementById(`level${level}Total`);
-                    const activeElement = document.getElementById(`level${level}Active`);
-                    const earningsElement = document.getElementById(`level${level}Earnings`);
-
-                    if (totalElement) totalElement.textContent = stats.levelCounts[level] || 0;
-                    if (activeElement) activeElement.textContent = stats.activeCounts[level] || 0;
-                    
-                    // Calculate and display level earnings (this would need additional backend support)
-                    if (earningsElement) {
-                        earningsElement.textContent = '₹0.00'; // Placeholder - would need level-wise earnings tracking
+                // Count by level
+                const levelCounts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0};
+                referrals?.forEach(ref => {
+                    if (levelCounts[ref.level] !== undefined) {
+                        levelCounts[ref.level]++;
                     }
+                });
+
+                // Update level counts
+                for (let level = 1; level <= 7; level++) {
+                    const element = document.getElementById(`level${level}Count`);
+                    if (element) {
+                        element.textContent = `${levelCounts[level]} users`;
+                    }
+                }
+
+                // Update total referrals
+                const totalReferrals = referrals?.length || 0;
+                document.getElementById('totalReferrals').textContent = totalReferrals;
+
+                // Calculate active users (users who are active today)
+                const today = new Date().toISOString().split('T')[0];
+                const { data: activeUsers, error: activeError } = await supabase
+                    .from('users')
+                    .select('id')
+                    .in('id', referrals?.map(ref => ref.invitee_id) || [])
+                    .eq('is_active', true)
+                    .eq('last_activity_date', today);
+
+                if (!activeError) {
+                    document.getElementById('activeReferrals').textContent = activeUsers?.length || 0;
+                }
+
+                // Calculate total referral earnings
+                const { data: earnings, error: earningsError } = await supabase
+                    .from('earnings')
+                    .select('amount')
+                    .eq('user_id', currentUser.id)
+                    .eq('type', 'referral');
+
+                if (!earningsError) {
+                    const totalEarnings = earnings?.reduce((sum, earning) => sum + earning.amount, 0) || 0;
+                    document.getElementById('totalEarnings').textContent = `₹${totalEarnings.toFixed(2)}`;
+                }
+
+                // Calculate today's commission earnings
+                const { data: todaysCommissions, error: commissionError } = await supabase
+                    .from('referral_commissions')
+                    .select('commission_amount')
+                    .eq('inviter_id', currentUser.id)
+                    .eq('date', today);
+
+                if (!commissionError) {
+                    const todaysEarnings = todaysCommissions?.reduce((sum, c) => sum + c.commission_amount, 0) || 0;
+                    document.getElementById('todaysCommissions').textContent = `₹${todaysEarnings.toFixed(2)}`;
                 }
 
             } catch (error) {
@@ -501,14 +460,22 @@
 
         async function loadCommissionHistory() {
             try {
-                const history = await referralManager.getCommissionHistory(currentUser.id, 10);
-                
-                if (history.error) throw history.error;
+                const { data, error } = await supabase
+                    .from('referral_commissions')
+                    .select(`
+                        *,
+                        invitee:users!referral_commissions_invitee_id_fkey(email)
+                    `)
+                    .eq('inviter_id', currentUser.id)
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
 
                 const container = document.getElementById('commissionHistory');
                 
-                if (history.data && history.data.length > 0) {
-                    container.innerHTML = history.data.map(commission => {
+                if (data && data.length > 0) {
+                    container.innerHTML = data.map(commission => {
                         const commissionDate = new Date(commission.created_at);
                         const timeAgo = getTimeAgo(commissionDate);
                         
