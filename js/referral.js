@@ -1,411 +1,204 @@
-// Referral system with 7-level tracking
-async function processReferral(inviteeId, referralCode) {
-    try {
-        if (!referralCode) return;
+// Referral system management
+class ReferralManager {
+    constructor() {
+        this.supabase = window.authUtils?.supabase;
+        this.bonusAmounts = {
+            1: 25.00, // Level 1: ₹25
+            2: 10.00, // Level 2: ₹10
+            3: 5.00,  // Level 3: ₹5
+            4: 2.50,  // Level 4: ₹2.50
+            5: 1.25,  // Level 5: ₹1.25
+            6: 0.75,  // Level 6: ₹0.75
+            7: 0.50   // Level 7: ₹0.50
+        };
+    }
 
-        // Find inviter by referral code
-        const { data: inviter, error: inviterError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('referral_code', referralCode)
-            .single();
+    // Generate referral code
+    generateReferralCode() {
+        return Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
 
-        if (inviterError || !inviter) return;
+    // Get user referral stats
+    async getReferralStats(userId) {
+        try {
+            // Get total referrals count by level
+            const { data: referrals, error } = await this.supabase
+                .from('referrals')
+                .select('level, invitee_id')
+                .eq('inviter_id', userId);
 
-        // Check if referral already processed
-        const { data: existingReferral, error: checkError } = await supabase
-            .from('referrals')
-            .select('*')
-            .eq('invitee_id', inviteeId)
-            .single();
+            if (error) throw error;
 
-        if (existingReferral) return;
-
-        // Add referral record for level 1
-        const { error: referralError } = await supabase
-            .from('referrals')
-            .insert({
-                inviter_id: inviter.id,
-                invitee_id: inviteeId,
-                level: 1,
-                bonus_given: false
+            // Count by level
+            const levelCounts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0};
+            referrals?.forEach(ref => {
+                if (levelCounts[ref.level] !== undefined) {
+                    levelCounts[ref.level]++;
+                }
             });
 
-        if (referralError) throw referralError;
+            // Get referral earnings
+            const { data: earnings, error: earningsError } = await this.supabase
+                .from('earnings')
+                .select('amount')
+                .eq('user_id', userId)
+                .eq('type', 'referral');
 
-        // Give direct referral bonus (250 coins each)
-        const inviterUpdated = await updateCoins(inviter.id, 250, 'earn', 'referral');
-        const inviteeUpdated = await updateCoins(inviteeId, 250, 'earn', 'referral');
+            const totalEarnings = earnings?.reduce((sum, earning) => sum + earning.amount, 0) || 0;
 
-        if (inviterUpdated && inviteeUpdated) {
-            // Add earning records
-            await addEarningRecord(inviter.id, 'referral', 250, 1);
-            await addEarningRecord(inviteeId, 'referral', 250, 1);
-
-            // Mark bonus as given
-            await supabase
-                .from('referrals')
-                .update({ bonus_given: true })
-                .eq('invitee_id', inviteeId);
-
-            // Build multi-level referral chain
-            await buildReferralChain(inviter.id, inviteeId);
+            return {
+                totalReferrals: referrals?.length || 0,
+                levelCounts,
+                totalEarnings,
+                error: null
+            };
+        } catch (error) {
+            console.error('Error getting referral stats:', error);
+            return { error };
         }
-    } catch (error) {
-        console.error('Referral processing error:', error);
     }
-}
 
-// Build multi-level referral chain
-async function buildReferralChain(topInviterId, newUserId) {
-    try {
-        let currentInviterId = topInviterId;
-        
-        for (let level = 2; level <= 7; level++) {
-            // Find who referred the current inviter
-            const { data: referral, error } = await supabase
-                .from('referrals')
-                .select('inviter_id')
-                .eq('invitee_id', currentInviterId)
-                .eq('level', 1)
+    // Process referral signup
+    async processReferralSignup(inviteeId, referralCode) {
+        try {
+            if (!referralCode) return { error: null };
+
+            // Find inviter by referral code
+            const { data: inviter, error: inviterError } = await this.supabase
+                .from('users')
+                .select('*')
+                .eq('referral_code', referralCode)
                 .single();
 
-            if (error || !referral) break;
+            if (inviterError || !inviter) {
+                console.warn('Invalid referral code:', referralCode);
+                return { error: null }; // Not a critical error
+            }
 
-            const nextLevelInviterId = referral.inviter_id;
-            
-            // Create referral record for this level
-            await supabase
+            // Add level 1 referral record
+            const { error: referralError } = await this.supabase
                 .from('referrals')
                 .insert({
-                    inviter_id: nextLevelInviterId,
-                    invitee_id: newUserId,
-                    level: level,
+                    inviter_id: inviter.id,
+                    invitee_id: inviteeId,
+                    level: 1,
                     bonus_given: false
                 });
 
-            currentInviterId = nextLevelInviterId;
+            if (referralError) throw referralError;
+
+            // Give bonuses
+            await this.giveReferralBonuses(inviter.id, inviteeId, 1);
+
+            return { error: null };
+        } catch (error) {
+            console.error('Error processing referral signup:', error);
+            return { error };
         }
-    } catch (error) {
-        console.error('Error building referral chain:', error);
     }
-}
 
-async function getReferralStats(userId) {
-    try {
-        // Get all referrals across 7 levels
-        const { data: referrals, error: refError } = await supabase
-            .from('referrals')
-            .select('*')
-            .eq('inviter_id', userId);
+    // Give referral bonuses
+    async giveReferralBonuses(inviterId, inviteeId, currentLevel) {
+        try {
+            if (currentLevel > 7) return;
 
-        if (refError) throw refError;
+            const bonusAmount = this.bonusAmounts[currentLevel];
+            if (!bonusAmount) return;
 
-        // Get referral earnings including commissions
-        const { data: earnings, error: earnError } = await supabase
-            .from('earnings')
-            .select('coins, level')
-            .eq('user_id', userId)
-            .in('type', ['referral', 'commission']);
+            // Give bonus to inviter
+            const wallet = window.walletManager;
+            await wallet.updateBalance(inviterId, bonusAmount, 'add');
+            await wallet.addEarning(
+                inviterId, 
+                'referral', 
+                bonusAmount, 
+                `Level ${currentLevel} referral bonus`
+            );
 
-        if (earnError) throw earnError;
-
-        const totalEarnings = earnings.reduce((sum, earning) => sum + earning.coins, 0);
-
-        // Calculate earnings by level
-        const earningsByLevel = {};
-        earnings.forEach(earning => {
-            const level = earning.level || 1;
-            if (!earningsByLevel[level]) {
-                earningsByLevel[level] = 0;
+            // Give bonus to invitee for level 1
+            if (currentLevel === 1) {
+                await wallet.updateBalance(inviteeId, bonusAmount, 'add');
+                await wallet.addEarning(
+                    inviteeId,
+                    'referral',
+                    bonusAmount,
+                    'Referral signup bonus'
+                );
             }
-            earningsByLevel[level] += earning.coins;
-        });
 
-        return {
-            totalReferrals: referrals?.length || 0,
-            totalEarnings: totalEarnings,
-            earningsByLevel: earningsByLevel,
-            referrals: referrals || []
-        };
-    } catch (error) {
-        console.error('Error getting referral stats:', error);
-        return { 
-            totalReferrals: 0, 
-            totalEarnings: 0, 
-            earningsByLevel: {},
-            referrals: [] 
-        };
-    }
-}
-
-// Get detailed referral network
-async function getReferralNetwork(userId) {
-    try {
-        const { data: referrals, error } = await supabase
-            .from('referrals')
-            .select(`
-                *,
-                invitee:users!referrals_invitee_id_fkey (
-                    id,
-                    email,
-                    name,
-                    total_coins,
-                    last_checkin
-                )
-            `)
-            .eq('inviter_id', userId)
-            .order('level', { ascending: true })
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        // Group by level
-        const networkByLevel = {};
-        referrals?.forEach(ref => {
-            const level = ref.level;
-            if (!networkByLevel[level]) {
-                networkByLevel[level] = [];
+            // Propagate to higher levels
+            if (currentLevel === 1) {
+                await this.propagateToHigherLevels(inviterId, 2);
             }
-            
-            // Check if invitee is active today
-            const today = new Date().toISOString().split('T')[0];
-            const isActive = ref.invitee.last_checkin === today;
-            
-            networkByLevel[level].push({
-                ...ref,
-                isActive: isActive
-            });
-        });
-
-        return networkByLevel;
-    } catch (error) {
-        console.error('Error getting referral network:', error);
-        return {};
-    }
-}
-
-// ✅ URL se referral code extract karein aur store karein
-function handleReferralFromURL() {
-    try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const refCode = urlParams.get('ref');
-        
-        if (refCode && refCode.length >= 6) {
-            console.log('🔗 Referral code detected in URL:', refCode);
-            
-            // Referral code localStorage mein save karein
-            localStorage.setItem('pendingReferral', refCode);
-            
-            // Clean URL (browser history se referral code hata de)
-            if (window.history && window.history.replaceState) {
-                const cleanURL = window.location.pathname;
-                window.history.replaceState({}, document.title, cleanURL);
-            }
-            
-            return refCode;
+        } catch (error) {
+            console.error('Error giving referral bonuses:', error);
         }
-    } catch (error) {
-        console.error('❌ Error handling referral from URL:', error);
     }
-    return null;
-}
 
-// ✅ Signup/registration ke time referral code use karein
-async function applyPendingReferral(userId) {
-    try {
-        const pendingRef = localStorage.getItem('pendingReferral');
-        
-        if (pendingRef && userId) {
-            console.log('🔗 Applying referral code:', pendingRef, 'for user:', userId);
-            
-            // Aapka existing processReferral function call karein
-            await processReferral(userId, pendingRef);
-            
-            // Clear pending referral
-            localStorage.removeItem('pendingReferral');
-            
-            return true;
+    // Propagate bonuses to higher levels
+    async propagateToHigherLevels(originalInviteeId, currentLevel) {
+        if (currentLevel > 7) return;
+
+        try {
+            // Find who referred the original inviter
+            const { data: higherRef, error } = await this.supabase
+                .from('referrals')
+                .select('inviter_id')
+                .eq('invitee_id', originalInviteeId)
+                .eq('level', 1)
+                .single();
+
+            if (error || !higherRef) return;
+
+            const bonusAmount = this.bonusAmounts[currentLevel];
+            if (!bonusAmount) return;
+
+            // Give bonus to higher level inviter
+            const wallet = window.walletManager;
+            await wallet.updateBalance(higherRef.inviter_id, bonusAmount, 'add');
+            await wallet.addEarning(
+                higherRef.inviter_id,
+                'referral',
+                bonusAmount,
+                `Level ${currentLevel} referral bonus`
+            );
+
+            // Add referral record for higher level
+            await this.supabase
+                .from('referrals')
+                .insert({
+                    inviter_id: higherRef.inviter_id,
+                    invitee_id: originalInviteeId,
+                    level: currentLevel,
+                    bonus_given: true
+                });
+
+            // Continue to next level
+            await this.propagateToHigherLevels(higherRef.inviter_id, currentLevel + 1);
+        } catch (error) {
+            console.error('Error propagating referral bonus:', error);
         }
-    } catch (error) {
-        console.error('❌ Error applying pending referral:', error);
     }
-    return false;
-}
 
-// ✅ Generate Proper Referral Link for Sharing
-function generateReferralLink() {
-    try {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user || !user.referral_code) {
-            console.log('❌ User or referral code not found');
-            return 'https://sonarrati.github.io/Cryptra-App/';
-        }
-        
-        // YEH HI LINK SHARE KAREIN - Best working
-        const referralLink = `https://sonarrati.github.io/Cryptra-App/?ref=${user.referral_code}`;
-        console.log('✅ Generated referral link:', referralLink);
-        return referralLink;
-    } catch (error) {
-        console.error('❌ Error generating referral link:', error);
-        return 'https://sonarrati.github.io/Cryptra-App/';
-    }
-}
+    // Get referral history
+    async getReferralHistory(userId, limit = 10) {
+        try {
+            const { data, error } = await this.supabase
+                .from('earnings')
+                .select('*')
+                .eq('user_id', userId)
+                .eq('type', 'referral')
+                .order('created_at', { ascending: false })
+                .limit(limit);
 
-// ✅ Copy Referral Link to Clipboard
-async function copyReferralLink() {
-    try {
-        const referralLink = generateReferralLink();
-        
-        // Modern clipboard API
-        if (navigator.clipboard && window.isSecureContext) {
-            await navigator.clipboard.writeText(referralLink);
-        } else {
-            // Fallback for older browsers
-            const tempInput = document.createElement('input');
-            tempInput.value = referralLink;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-        }
-        
-        // Success message
-        showNotification('✅ Referral link copied to clipboard!', 'success');
-        return true;
-    } catch (error) {
-        console.error('❌ Error copying referral link:', error);
-        showNotification('❌ Failed to copy link', 'error');
-        return false;
-    }
-}
-
-// ✅ Show Notification
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-2xl shadow-lg ${
-        type === 'success' ? 'bg-green-500 text-white' : 
-        type === 'error' ? 'bg-red-500 text-white' : 
-        'bg-blue-500 text-white'
-    }`;
-    notification.innerHTML = `
-        <div class="flex items-center space-x-2">
-            <i class="fas ${type === 'success' ? 'fa-check' : type === 'error' ? 'fa-times' : 'fa-info'}"></i>
-            <span>${message}</span>
-        </div>
-    `;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
-}
-
-// ✅ Load Referral Page Data
-async function loadReferralPage() {
-    try {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
-
-        // Referral stats load karein
-        const stats = await getReferralStats(user.id);
-        displayReferralStats(stats);
-        
-        // Referral network load karein
-        const network = await getReferralNetwork(user.id);
-        displayReferralNetwork(network);
-        
-        // Referral link display karein
-        const referralLinkElement = document.getElementById('referralLink');
-        if (referralLinkElement) {
-            referralLinkElement.value = generateReferralLink();
-        }
-        
-    } catch (error) {
-        console.error('❌ Error loading referral page:', error);
-    }
-}
-
-// ✅ Display Referral Stats
-function displayReferralStats(stats) {
-    const totalReferralsElement = document.getElementById('totalReferrals');
-    const totalEarningsElement = document.getElementById('totalEarnings');
-    const levelsEarningsElement = document.getElementById('levelsEarnings');
-    
-    if (totalReferralsElement) {
-        totalReferralsElement.textContent = stats.totalReferrals || 0;
-    }
-    
-    if (totalEarningsElement) {
-        totalEarningsElement.textContent = stats.totalEarnings || 0;
-    }
-    
-    // Level-wise earnings display karein
-    if (levelsEarningsElement) {
-        levelsEarningsElement.innerHTML = '';
-        for (let level = 1; level <= 7; level++) {
-            const earnings = stats.earningsByLevel[level] || 0;
-            levelsEarningsElement.innerHTML += `
-                <div class="flex justify-between items-center p-2 border-b border-gray-200">
-                    <span class="text-gray-700">Level ${level}:</span>
-                    <span class="font-bold text-green-600">${earnings} coins</span>
-                </div>
-            `;
+            if (error) throw error;
+            return { data, error: null };
+        } catch (error) {
+            console.error('Error getting referral history:', error);
+            return { data: null, error };
         }
     }
 }
 
-// ✅ Display Referral Network
-function displayReferralNetwork(network) {
-    const networkContainer = document.getElementById('referralNetwork');
-    if (!networkContainer) return;
-    
-    networkContainer.innerHTML = '';
-    
-    for (let level = 1; level <= 7; level++) {
-        const levelData = network[level] || [];
-        
-        const levelHTML = `
-            <div class="bg-white rounded-xl shadow-md p-4 mb-4">
-                <h4 class="font-bold text-lg text-gray-800 mb-3">Level ${level} (${levelData.length} users)</h4>
-                <div class="space-y-2">
-                    ${levelData.map(user => `
-                        <div class="flex justify-between items-center p-2 rounded-lg ${user.isActive ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}">
-                            <div>
-                                <span class="font-medium text-gray-700">${user.invitee.email || 'User'}</span>
-                                <span class="text-xs ml-2 ${user.isActive ? 'text-green-600' : 'text-gray-500'}">
-                                    ${user.isActive ? '🟢 Active Today' : '⚫ Inactive'}
-                                </span>
-                            </div>
-                            <span class="text-sm text-gray-600">${user.invitee.total_coins || 0} coins</span>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-        
-        networkContainer.innerHTML += levelHTML;
-    }
-}
-
-// ✅ Initialize Referral System on Page Load
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔗 Referral system initialized');
-    
-    // URL se referral code handle karein
-    handleReferralFromURL();
-    
-    // Agar referral page pe hain to data load karein
-    if (window.location.pathname.includes('referral.html')) {
-        loadReferralPage();
-        
-        // Copy button event listener
-        const copyButton = document.getElementById('copyReferralBtn');
-        if (copyButton) {
-            copyButton.addEventListener('click', copyReferralLink);
-        }
-    }
-});
+// Initialize referral manager
+window.referralManager = new ReferralManager();
