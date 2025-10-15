@@ -3,235 +3,512 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Referral Program - Earnzy</title>
+    <title>Refer & Earn - Cryptra</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         * { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .flutter-card {
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        .green-bg { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+        .green-card { 
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        }
+        .green-nav { background: rgba(16, 185, 129, 0.95); }
+        .level-card {
+            transition: all 0.3s ease;
+        }
+        .level-card:hover {
+            transform: translateY(-5px);
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen">
+<body class="bg-gray-50 min-h-screen pb-20">
     <!-- Header -->
-    <header class="bg-white/10 backdrop-blur-lg py-4 px-6">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-coins text-xl text-gray-800"></i>
+    <header class="green-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <a href="dashboard.html" class="text-white">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-bold">Refer & Earn</h1>
+                        <p class="text-green-100 text-sm">7-Level Referral System</p>
+                    </div>
                 </div>
-                <span class="text-2xl font-bold text-white">Earnzy</span>
+                <div class="text-right">
+                    <div class="text-white font-bold text-lg" id="referralEarnings">₹0.00</div>
+                    <div class="text-green-100 text-sm">Earned</div>
+                </div>
             </div>
-            <nav class="flex space-x-6">
-                <a href="dashboard.html" class="text-white/80 hover:text-white transition-colors">
-                    <i class="fas fa-home mr-2"></i>Dashboard
-                </a>
-                <a href="referral.html" class="text-white font-semibold">
-                    <i class="fas fa-users mr-2"></i>Referral
-                </a>
-                <a href="profile.html" class="text-white/80 hover:text-white transition-colors">
-                    <i class="fas fa-user mr-2"></i>Profile
-                </a>
-            </nav>
         </div>
     </header>
 
-    <div class="max-w-6xl mx-auto py-8 px-4">
-        <!-- Page Title -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-white mb-2">Referral Program</h1>
-            <p class="text-xl text-white/80">Invite friends and earn unlimited rewards!</p>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-2xl p-6 shadow-lg text-center">
-                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-users text-2xl text-blue-600"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-800" id="totalReferrals">0</h3>
-                <p class="text-gray-600">Total Referrals</p>
-            </div>
-            
-            <div class="bg-white rounded-2xl p-6 shadow-lg text-center">
-                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-coins text-2xl text-green-600"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-800" id="totalEarnings">0</h3>
-                <p class="text-gray-600">Total Earnings</p>
-            </div>
-            
-            <div class="bg-white rounded-2xl p-6 shadow-lg text-center">
-                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-layer-group text-2xl text-purple-600"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-800">7</h3>
-                <p class="text-gray-600">Referral Levels</p>
-            </div>
-        </div>
-
-        <!-- Referral Link Section -->
-        <div class="bg-white rounded-2xl p-8 shadow-lg mb-8 flutter-card">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Your Referral Link</h2>
-            
-            <div class="flex flex-col md:flex-row gap-4 mb-4">
-                <input 
-                    type="text" 
-                    id="referralLink" 
-                    readonly 
-                    class="flex-1 px-4 py-4 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-700 text-lg font-medium"
-                >
-                <button 
-                    id="copyReferralBtn"
-                    class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg flex items-center justify-center space-x-2"
-                >
-                    <i class="fas fa-copy"></i>
-                    <span>Copy Link</span>
-                </button>
-            </div>
-            
-            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                <div class="flex items-start space-x-3">
-                    <i class="fas fa-gift text-yellow-600 text-xl mt-1"></i>
-                    <div>
-                        <h4 class="font-bold text-yellow-800 mb-1">🎉 Bonus Offer!</h4>
-                        <p class="text-yellow-700">
-                            You and your friend both get <strong>250 bonus coins</strong> when they sign up using your link!
-                        </p>
+    <!-- Referral System -->
+    <section class="p-4">
+        <div class="container mx-auto">
+            <!-- Referral Stats -->
+            <div class="green-card rounded-2xl p-6 mb-6">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-500" id="totalReferrals">0</div>
+                        <div class="text-gray-600 text-sm">Total Referrals</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-500" id="activeReferrals">0</div>
+                        <div class="text-gray-600 text-sm">Active Users</div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Referral Levels & Earnings -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <!-- Earnings by Level -->
-            <div class="bg-white rounded-2xl p-6 shadow-lg">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Earnings by Level</h3>
-                <div id="levelsEarnings" class="space-y-2">
-                    <!-- Levels will be dynamically loaded here -->
-                    <div class="text-center py-8 text-gray-500">
-                        <i class="fas fa-chart-bar text-4xl mb-4"></i>
-                        <p>Loading earnings data...</p>
+                <!-- Referral Code -->
+                <div class="bg-green-50 rounded-2xl p-4 mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3">Your Referral Code</h3>
+                    <div class="flex items-center space-x-3">
+                        <input 
+                            type="text" 
+                            id="referralCode"
+                            class="flex-1 bg-white border border-gray-300 rounded-2xl px-4 py-3 text-gray-800 font-bold text-center focus:outline-none"
+                            readonly
+                        >
+                        <button 
+                            onclick="copyReferralCode()"
+                            class="bg-green-500 text-white px-4 py-3 rounded-2xl font-semibold hover:bg-green-600 transition-colors"
+                        >
+                            <i class="fas fa-copy"></i>
+                        </button>
                     </div>
+                    <p class="text-sm text-gray-600 mt-2 text-center">Share this code with friends to earn money</p>
+                </div>
+
+                <!-- Referral Link -->
+                <div class="bg-green-50 rounded-2xl p-4 mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3">Your Referral Link</h3>
+                    <div class="flex items-center space-x-3">
+                        <input 
+                            type="text" 
+                            id="referralLink"
+                            class="flex-1 bg-white border border-gray-300 rounded-2xl px-4 py-3 text-gray-800 text-sm focus:outline-none"
+                            readonly
+                        >
+                        <button 
+                            onclick="copyReferralLink()"
+                            class="bg-green-500 text-white px-4 py-3 rounded-2xl font-semibold hover:bg-green-600 transition-colors"
+                        >
+                            <i class="fas fa-link"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Share Buttons -->
+                <div class="grid grid-cols-4 gap-3 mb-4">
+                    <button onclick="shareWhatsApp()" class="bg-green-500 text-white py-3 rounded-2xl font-semibold hover:bg-green-600 transition-colors">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                    <button onclick="shareTelegram()" class="bg-blue-500 text-white py-3 rounded-2xl font-semibold hover:bg-blue-600 transition-colors">
+                        <i class="fab fa-telegram"></i>
+                    </button>
+                    <button onclick="shareFacebook()" class="bg-blue-600 text-white py-3 rounded-2xl font-semibold hover:bg-blue-700 transition-colors">
+                        <i class="fab fa-facebook"></i>
+                    </button>
+                    <button onclick="shareTwitter()" class="bg-sky-500 text-white py-3 rounded-2xl font-semibold hover:bg-sky-600 transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- How it Works -->
-            <div class="bg-white rounded-2xl p-6 shadow-lg">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">How It Works</h3>
+            <!-- 7-Level System -->
+            <div class="green-card rounded-2xl p-6 mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">7-Level Referral System</h2>
+                
                 <div class="space-y-4">
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center flex-shrink-0">
-                            <span class="font-bold">1</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-800">Share Your Link</h4>
-                            <p class="text-gray-600 text-sm">Share your unique referral link with friends</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center flex-shrink-0">
-                            <span class="font-bold">2</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-800">Friends Sign Up</h4>
-                            <p class="text-gray-600 text-sm">Your friends register using your link</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center flex-shrink-0">
-                            <span class="font-bold">3</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-800">Earn Together</h4>
-                            <p class="text-gray-600 text-sm">Both get 250 coins instantly + earn from 7 levels</p>
+                    <!-- Level 1 -->
+                    <div class="level-card bg-green-50 rounded-2xl p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">1</span>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Level 1 - Direct Referrals</div>
+                                    <div class="text-sm text-gray-600">Your direct team members</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-green-500 font-bold">₹25.00</div>
+                                <div class="text-xs text-gray-500" id="level1Count">0 users</div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Level Commission Rates -->
-                <div class="mt-6 bg-gray-50 rounded-xl p-4">
-                    <h4 class="font-bold text-gray-800 mb-3">7-Level Commission Structure</h4>
-                    <div class="grid grid-cols-2 gap-2 text-sm">
-                        <div class="flex justify-between p-2 bg-white rounded">
-                            <span>Level 1:</span>
-                            <span class="font-bold text-green-600">250 coins</span>
+                    <!-- Level 2 -->
+                    <div class="level-card bg-green-100 rounded-2xl p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">2</span>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Level 2 - Team's Referrals</div>
+                                    <div class="text-sm text-gray-600">Referrals of your direct team</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-green-500 font-bold">₹10.00</div>
+                                <div class="text-xs text-gray-500" id="level2Count">0 users</div>
+                            </div>
                         </div>
-                        <div class="flex justify-between p-2 bg-white rounded">
-                            <span>Level 2:</span>
-                            <span class="font-bold text-green-600">50 coins</span>
+                    </div>
+
+                    <!-- Level 3 -->
+                    <div class="level-card bg-green-200 rounded-2xl p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-green-700 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">3</span>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Level 3 - Extended Network</div>
+                                    <div class="text-sm text-gray-600">Third level from your team</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-green-500 font-bold">₹5.00</div>
+                                <div class="text-xs text-gray-500" id="level3Count">0 users</div>
+                            </div>
                         </div>
-                        <div class="flex justify-between p-2 bg-white rounded">
-                            <span>Level 3:</span>
-                            <span class="font-bold text-green-600">25 coins</span>
+                    </div>
+
+                    <!-- Level 4 -->
+                    <div class="level-card bg-green-300 rounded-2xl p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-green-800 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">4</span>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Level 4 - Growing Network</div>
+                                    <div class="text-sm text-gray-600">Fourth level from your team</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-green-500 font-bold">₹2.50</div>
+                                <div class="text-xs text-gray-500" id="level4Count">0 users</div>
+                            </div>
                         </div>
-                        <div class="flex justify-between p-2 bg-white rounded">
-                            <span>Level 4:</span>
-                            <span class="font-bold text-green-600">15 coins</span>
+                    </div>
+
+                    <!-- Level 5 -->
+                    <div class="level-card bg-green-400 rounded-2xl p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-green-900 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">5</span>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Level 5 - Deep Network</div>
+                                    <div class="text-sm text-gray-600">Fifth level from your team</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-green-500 font-bold">₹1.25</div>
+                                <div class="text-xs text-gray-500" id="level5Count">0 users</div>
+                            </div>
                         </div>
-                        <div class="flex justify-between p-2 bg-white rounded">
-                            <span>Level 5:</span>
-                            <span class="font-bold text-green-600">10 coins</span>
+                    </div>
+
+                    <!-- Level 6 -->
+                    <div class="level-card bg-green-500 rounded-2xl p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-green-800 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">6</span>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Level 6 - Extended Reach</div>
+                                    <div class="text-sm text-gray-600">Sixth level from your team</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-green-500 font-bold">₹0.75</div>
+                                <div class="text-xs text-gray-500" id="level6Count">0 users</div>
+                            </div>
                         </div>
-                        <div class="flex justify-between p-2 bg-white rounded">
-                            <span>Level 6:</span>
-                            <span class="font-bold text-green-600">5 coins</span>
-                        </div>
-                        <div class="flex justify-between p-2 bg-white rounded">
-                            <span>Level 7:</span>
-                            <span class="font-bold text-green-600">5 coins</span>
+                    </div>
+
+                    <!-- Level 7 -->
+                    <div class="level-card bg-green-600 rounded-2xl p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-green-900 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">7</span>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Level 7 - Maximum Depth</div>
+                                    <div class="text-sm text-gray-600">Seventh level from your team</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-green-500 font-bold">₹0.50</div>
+                                <div class="text-xs text-gray-500" id="level7Count">0 users</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Referral Network -->
-        <div class="bg-white rounded-2xl p-6 shadow-lg">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Your Referral Network</h3>
-            <div id="referralNetwork" class="space-y-4">
-                <!-- Network will be dynamically loaded here -->
-                <div class="text-center py-8 text-gray-500">
-                    <i class="fas fa-network-wired text-4xl mb-4"></i>
-                    <p>Loading your network...</p>
+            <!-- Referral Earnings -->
+            <div class="green-card rounded-2xl p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Recent Referral Earnings</h3>
+                <div id="referralHistory" class="space-y-3">
+                    <div class="text-center py-8">
+                        <i class="fas fa-users text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-400">No referral earnings yet</p>
+                        <p class="text-gray-500 text-sm mt-1">Start referring to see your earnings here</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Scripts -->
+    <!-- Bottom Navigation -->
+    <nav class="green-nav fixed bottom-0 left-0 right-0 text-white py-3">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-5 gap-4">
+                <a href="dashboard.html" class="text-center text-white">
+                    <i class="fas fa-home text-xl mb-1"></i>
+                    <div class="text-xs">Home</div>
+                </a>
+                <a href="watch.html" class="text-center text-white">
+                    <i class="fas fa-rupee-sign text-xl mb-1"></i>
+                    <div class="text-xs">Earn</div>
+                </a>
+                <a href="tasks.html" class="text-center text-white">
+                    <i class="fas fa-tasks text-xl mb-1"></i>
+                    <div class="text-xs">Tasks</div>
+                </a>
+                <a href="withdraw.html" class="text-center text-white">
+                    <i class="fas fa-wallet text-xl mb-1"></i>
+                    <div class="text-xs">Wallet</div>
+                </a>
+                <a href="profile.html" class="text-center text-white">
+                    <i class="fas fa-user text-xl mb-1"></i>
+                    <div class="text-xs">Profile</div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration
+        // Initialize Supabase
         const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d2Fpc3lpc3pkaHdteXJuYmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjQ2NjMsImV4cCI6MjA3NTUwMDY2M30.gf9vwF44EysfVHJBN_ifmosjIe3kpUn77TcWiaX51sY';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-        
-        // Check authentication
-        async function checkAuth() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
+
+        let currentUser = null;
+
+        async function loadReferralPage() {
+            try {
+                // Check authentication
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = session.user;
+                await loadReferralData();
+                await loadReferralHistory();
+
+            } catch (error) {
+                console.error('Referral page load error:', error);
                 window.location.href = 'login.html';
-                return false;
             }
-            return true;
         }
-        
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', async function() {
-            const isAuthenticated = await checkAuth();
-            if (isAuthenticated) {
-                console.log('🔗 Referral page loaded for authenticated user');
+
+        async function loadReferralData() {
+            try {
+                // Load user data with referral code
+                const { data: userData, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (error) throw error;
+
+                // Set referral code and link
+                document.getElementById('referralCode').value = userData.referral_code;
+                document.getElementById('referralLink').value = `${window.location.origin}/signup.html?ref=${userData.referral_code}`;
+
+                // Load referral statistics
+                await loadReferralStats();
+
+            } catch (error) {
+                console.error('Error loading referral data:', error);
             }
-        });
+        }
+
+        async function loadReferralStats() {
+            try {
+                // Get total referrals count
+                const { data: referrals, error } = await supabase
+                    .from('referrals')
+                    .select('level, invitee_id')
+                    .eq('inviter_id', currentUser.id);
+
+                if (error) throw error;
+
+                // Count referrals by level
+                const levelCounts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0};
+                referrals?.forEach(ref => {
+                    if (levelCounts[ref.level] !== undefined) {
+                        levelCounts[ref.level]++;
+                    }
+                });
+
+                // Update level counts
+                for (let level = 1; level <= 7; level++) {
+                    const element = document.getElementById(`level${level}Count`);
+                    if (element) {
+                        element.textContent = `${levelCounts[level]} users`;
+                    }
+                }
+
+                // Update total referrals
+                const totalReferrals = referrals?.length || 0;
+                document.getElementById('totalReferrals').textContent = totalReferrals;
+
+                // Calculate active users (users who have earned at least ₹10)
+                const { data: activeUsers, error: activeError } = await supabase
+                    .from('users')
+                    .select('id')
+                    .in('id', referrals?.map(ref => ref.invitee_id) || [])
+                    .gte('earned_balance', 10);
+
+                if (!activeError) {
+                    document.getElementById('activeReferrals').textContent = activeUsers?.length || 0;
+                }
+
+                // Calculate total referral earnings
+                const { data: earnings, error: earningsError } = await supabase
+                    .from('earnings')
+                    .select('amount')
+                    .eq('user_id', currentUser.id)
+                    .eq('type', 'referral');
+
+                if (!earningsError) {
+                    const totalEarnings = earnings?.reduce((sum, earning) => sum + earning.amount, 0) || 0;
+                    document.getElementById('referralEarnings').textContent = `₹${totalEarnings.toFixed(2)}`;
+                }
+
+            } catch (error) {
+                console.error('Error loading referral stats:', error);
+            }
+        }
+
+        async function loadReferralHistory() {
+            try {
+                const { data: earnings, error } = await supabase
+                    .from('earnings')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('type', 'referral')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                const container = document.getElementById('referralHistory');
+                
+                if (earnings && earnings.length > 0) {
+                    container.innerHTML = earnings.map(earning => `
+                        <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i class="fas fa-user-friends text-green-500 text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">${earning.description}</div>
+                                    <div class="text-xs text-gray-500">${new Date(earning.created_at).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                            <div class="text-green-500 font-bold text-lg">+₹${earning.amount.toFixed(2)}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading referral history:', error);
+            }
+        }
+
+        function copyReferralCode() {
+            const codeInput = document.getElementById('referralCode');
+            codeInput.select();
+            codeInput.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            showNotification('Referral code copied!', 'success');
+        }
+
+        function copyReferralLink() {
+            const linkInput = document.getElementById('referralLink');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            showNotification('Referral link copied!', 'success');
+        }
+
+        function shareWhatsApp() {
+            const message = `Join Cryptra and start earning real money! Use my referral code: ${document.getElementById('referralCode').value}. Sign up here: ${document.getElementById('referralLink').value}`;
+            const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        function shareTelegram() {
+            const message = `Join Cryptra and start earning real money! Use my referral code: ${document.getElementById('referralCode').value}. Sign up here: ${document.getElementById('referralLink').value}`;
+            const url = `https://t.me/share/url?url=${encodeURIComponent(document.getElementById('referralLink').value)}&text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        function shareFacebook() {
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(document.getElementById('referralLink').value)}`;
+            window.open(url, '_blank');
+        }
+
+        function shareTwitter() {
+            const message = `Join Cryptra and start earning real money! Use my referral code: ${document.getElementById('referralCode').value}`;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}&url=${encodeURIComponent(document.getElementById('referralLink').value)}`;
+            window.open(url, '_blank');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.classList.remove('hidden');
+
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', loadReferralPage);
     </script>
-    <script src="js/referral.js"></script>
 </body>
 </html>
