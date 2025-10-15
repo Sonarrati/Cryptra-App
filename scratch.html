@@ -66,7 +66,7 @@
                     <i class="fas fa-scroll text-3xl text-white"></i>
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800 mb-2">Scratch & Win</h2>
-                <p class="text-gray-600 mb-4">Reveal hidden rewards under each card</p>
+                <p class="text-gray-600 mb-4">Click on cards to reveal hidden rewards</p>
                 
                 <div class="bg-green-50 rounded-2xl p-4 mb-6">
                     <div class="flex justify-between text-sm mb-2">
@@ -153,7 +153,6 @@
     <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="utils.js"></script>
     <script>
         // Initialize Supabase
         const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
@@ -201,13 +200,15 @@
                 todayEarnings = data || [];
                 const totalToday = todayEarnings.reduce((sum, earning) => sum + earning.amount, 0);
                 const scratchedToday = todayEarnings.length;
-                availableCards = 3 - scratchedToday;
+                availableCards = Math.max(0, 3 - scratchedToday);
 
                 document.getElementById('todayEarnings').textContent = `₹${totalToday.toFixed(2)}`;
                 document.getElementById('scratchedToday').textContent = `${scratchedToday}/3`;
 
             } catch (error) {
                 console.error('Error loading today earnings:', error);
+                document.getElementById('todayEarnings').textContent = '₹0.00';
+                document.getElementById('scratchedToday').textContent = '0/3';
             }
         }
 
@@ -234,7 +235,7 @@
                                 </div>
                                 <div>
                                     <div class="font-semibold text-gray-800">Scratch Card</div>
-                                    <div class="text-xs text-gray-500">${new Date(earning.created_at).toLocaleTimeString()}</div>
+                                    <div class="text-xs text-gray-500">${new Date(earning.created_at).toLocaleDateString()}</div>
                                 </div>
                             </div>
                             <div class="text-green-500 font-bold">+₹${earning.amount.toFixed(2)}</div>
@@ -252,7 +253,9 @@
 
             for (let i = 0; i < 3; i++) {
                 const card = document.createElement('div');
-                card.className = `scratch-card rounded-2xl aspect-square flex items-center justify-center cursor-pointer transform hover:scale-105 transition-all duration-300 ${i >= availableCards ? 'opacity-50 cursor-not-allowed scratched' : ''}`;
+                const isAvailable = i < availableCards;
+                
+                card.className = `scratch-card rounded-2xl aspect-square flex items-center justify-center cursor-pointer transform transition-all duration-300 ${!isAvailable ? 'opacity-50 cursor-not-allowed scratched' : 'hover:scale-105'}`;
                 card.innerHTML = `
                     <div class="text-center">
                         <i class="fas fa-question text-2xl text-white mb-2"></i>
@@ -260,8 +263,15 @@
                     </div>
                 `;
 
-                if (i < availableCards) {
+                if (isAvailable) {
                     card.onclick = () => scratchCard(i);
+                } else {
+                    card.innerHTML = `
+                        <div class="text-center">
+                            <i class="fas fa-check text-2xl text-white mb-2"></i>
+                            <div class="text-white font-semibold">Scratched</div>
+                        </div>
+                    `;
                 }
 
                 grid.appendChild(card);
@@ -272,14 +282,14 @@
             try {
                 // Check daily limit
                 if (todayEarnings.length >= 3) {
-                    appUtils.showNotification('Daily limit reached (3 cards)', 'error');
+                    showNotification('Daily limit reached (3 cards)', 'error');
                     return;
                 }
 
                 // Generate random money between ₹0.05-₹0.50
                 const money = (Math.random() * 0.45) + 0.05;
 
-                // Get user data
+                // Get user data first
                 const { data: userData, error: userError } = await supabase
                     .from('users')
                     .select('*')
@@ -292,8 +302,8 @@
                 const { error: updateError } = await supabase
                     .from('users')
                     .update({
-                        total_balance: (userData.total_balance || 0) + money,
-                        earned_balance: (userData.earned_balance || 0) + money
+                        total_balance: (parseFloat(userData.total_balance) || 0) + money,
+                        earned_balance: (parseFloat(userData.earned_balance) || 0) + money
                     })
                     .eq('id', currentUser.id);
 
@@ -330,11 +340,11 @@
                 await loadTodayEarnings();
                 await loadRecentWinnings();
 
-                appUtils.showNotification(`You won ₹${money.toFixed(2)}!`, 'success');
+                showNotification(`You won ₹${money.toFixed(2)}!`, 'success');
 
             } catch (error) {
                 console.error('Scratch card error:', error);
-                appUtils.showNotification('Failed to process scratch card', 'error');
+                showNotification('Failed to process scratch card', 'error');
             }
         }
 
@@ -342,6 +352,19 @@
             document.getElementById('resultDisplay').classList.add('hidden');
             document.getElementById('resetButton').classList.add('hidden');
             generateCards();
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.classList.remove('hidden');
+
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
         }
 
         // Initialize page
