@@ -246,6 +246,7 @@
     <div id="notification" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="utils.js"></script>
     <script>
         // Initialize Supabase
         const supabaseUrl = 'https://xzwaisyiszdhwmyrnbkh.supabase.co';
@@ -389,59 +390,45 @@
 
             } catch (error) {
                 console.error('Start check-in error:', error);
-                showNotification(error.message || 'Failed to start check-in', 'error');
+                appUtils.showNotification(error.message || 'Failed to start check-in', 'error');
             }
         }
 
         async function completeTask() {
             try {
-                console.log('Completing task for check-in...');
+                console.log('Completing daily check-in task...');
                 
-                // Hide task and show loading
+                // Show loading state
                 elements.taskDisplay.classList.add('hidden');
                 elements.loadingState.classList.remove('hidden');
 
                 const today = new Date().toISOString().split('T')[0];
-                const lastCheckin = userData.last_checkin;
-
-                let streak = userData.daily_streak || 0;
-                let money = 0;
-
-                // Calculate streak and money
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
                 const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-                if (lastCheckin === yesterdayStr) {
-                    streak += 1;
-                } else {
-                    streak = 1;
+                // Calculate streak and reward
+                let newStreak = 1;
+                if (userData.last_checkin === yesterdayStr) {
+                    newStreak = (userData.daily_streak || 0) + 1;
+                } else if (userData.last_checkin !== today) {
+                    newStreak = 1;
                 }
 
-                // Calculate money based on streak (Day1:0.10 → Day7:1.00)
-                money = Math.min(0.10 + (streak - 1) * 0.15, 1.00);
+                const todaysReward = Math.min(0.10 + (newStreak - 1) * 0.15, 1.00);
 
                 // Update user data
                 const { error: updateError } = await supabase
                     .from('users')
                     .update({
-                        daily_streak: streak,
+                        total_balance: (userData.total_balance || 0) + todaysReward,
+                        earned_balance: (userData.earned_balance || 0) + todaysReward,
+                        daily_streak: newStreak,
                         last_checkin: today
                     })
                     .eq('id', currentUser.id);
 
                 if (updateError) throw updateError;
-
-                // Add money
-                const { error: moneyError } = await supabase
-                    .from('users')
-                    .update({
-                        total_balance: userData.total_balance + money,
-                        earned_balance: userData.earned_balance + money
-                    })
-                    .eq('id', currentUser.id);
-
-                if (moneyError) throw moneyError;
 
                 // Add earning record
                 const { error: earningError } = await supabase
@@ -449,8 +436,8 @@
                     .insert({
                         user_id: currentUser.id,
                         type: 'checkin',
-                        amount: money,
-                        description: `Day ${streak} check-in reward`
+                        amount: todaysReward,
+                        description: `Daily check-in (Streak: ${newStreak})`
                     });
 
                 if (earningError) throw earningError;
@@ -458,45 +445,31 @@
                 // Update UI
                 elements.loadingState.classList.add('hidden');
                 elements.checkinStatus.classList.remove('hidden');
+                elements.checkinButton.disabled = true;
+                elements.checkinButton.textContent = 'Already Checked-in Today';
+                elements.checkinButton.classList.remove('pulse-animation');
                 
                 elements.statusIcon.className = 'w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4';
                 elements.statusIcon.innerHTML = '<i class="fas fa-check text-2xl text-white"></i>';
                 elements.statusTitle.textContent = 'Check-in Successful!';
-                elements.statusMessage.textContent = `Day ${streak} streak`;
-                elements.todaysReward.textContent = `+₹${money.toFixed(2)} earned`;
+                elements.statusMessage.textContent = `You earned ₹${todaysReward.toFixed(2)} and have a ${newStreak} day streak!`;
+                elements.todaysReward.textContent = `+₹${todaysReward.toFixed(2)} earned`;
 
-                elements.currentStreak.textContent = streak;
-                elements.checkinButton.disabled = true;
-                elements.checkinButton.textContent = 'Already Checked-in Today';
-                elements.checkinButton.classList.remove('pulse-animation');
-
-                showNotification(`Check-in successful! +₹${money.toFixed(2)} earned`, 'success');
-
-                // Reload data and regenerate calendar
+                // Update streak display
+                elements.currentStreak.textContent = newStreak;
+                
+                // Reload user data
                 await loadUserData();
                 generateStreakCalendar();
 
+                appUtils.showNotification(`Check-in successful! ₹${todaysReward.toFixed(2)} earned`, 'success');
+
             } catch (error) {
-                console.error('Checkin error:', error);
+                console.error('Complete task error:', error);
                 elements.loadingState.classList.add('hidden');
-                elements.checkinStatus.classList.remove('hidden');
-                elements.checkinButton.disabled = false;
-                elements.checkinButton.textContent = 'Complete Task & Claim Reward';
-                showNotification('Failed to process check-in', 'error');
+                elements.taskDisplay.classList.remove('hidden');
+                appUtils.showNotification('Failed to complete check-in', 'error');
             }
-        }
-
-        function showNotification(message, type) {
-            const notification = elements.notification;
-            notification.textContent = message;
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
-                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-            }`;
-            notification.classList.remove('hidden');
-
-            setTimeout(() => {
-                notification.classList.add('hidden');
-            }, 3000);
         }
 
         // Initialize page
