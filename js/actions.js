@@ -1,152 +1,213 @@
-// Earning actions with 7-level referral support
-async function watchAd() {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return { success: false, message: 'Not authenticated' };
+// Common actions and utilities
+class ActionManager {
+    constructor() {
+        this.supabase = window.authUtils?.supabase;
+    }
 
-        // Check daily limit (max 50 ads/day)
-        const todayEarnings = await checkDailyLimit(user.id, 'watch');
-        if (todayEarnings.length >= 50) {
-            return { success: false, message: 'Daily limit reached (50 ads)' };
+    // Show notification
+    showNotification(message, type = 'info') {
+        // Create notification element if it doesn't exist
+        let notification = document.getElementById('global-notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'global-notification';
+            notification.className = 'fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 hidden';
+            document.body.appendChild(notification);
         }
 
-        // Generate random coins between 10-20
-        const coins = Math.floor(Math.random() * 11) + 10;
+        notification.textContent = message;
+        
+        const typeClasses = {
+            success: 'bg-green-500 text-white',
+            error: 'bg-red-500 text-white',
+            warning: 'bg-yellow-500 text-white',
+            info: 'bg-blue-500 text-white'
+        };
 
-        // Update coins and add earning record
-        const coinUpdated = await updateCoins(user.id, coins, 'earn', 'watch');
-        const recordAdded = await addEarningRecord(user.id, 'watch', coins);
+        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-transform duration-300 ${typeClasses[type] || typeClasses.info}`;
+        notification.classList.remove('hidden');
 
-        if (coinUpdated && recordAdded) {
-            return { success: true, coins: coins };
-        } else {
-            return { success: false, message: 'Failed to process earning' };
+        // Auto hide after 3 seconds
+        setTimeout(() => {
+            notification.classList.add('hidden');
+        }, 3000);
+    }
+
+    // Show loading overlay
+    showLoading(message = 'Loading...') {
+        let loading = document.getElementById('global-loading');
+        if (!loading) {
+            loading = document.createElement('div');
+            loading.id = 'global-loading';
+            loading.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden';
+            loading.innerHTML = `
+                <div class="bg-white rounded-2xl p-6 text-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+                    <p class="text-gray-800 font-semibold">${message}</p>
+                </div>
+            `;
+            document.body.appendChild(loading);
         }
-    } catch (error) {
-        console.error('Watch ad error:', error);
-        return { success: false, message: 'An error occurred' };
+
+        loading.classList.remove('hidden');
+    }
+
+    // Hide loading overlay
+    hideLoading() {
+        const loading = document.getElementById('global-loading');
+        if (loading) {
+            loading.classList.add('hidden');
+        }
+    }
+
+    // Format currency
+    formatCurrency(amount) {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR'
+        }).format(amount);
+    }
+
+    // Format date
+    formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+
+    // Format time
+    formatTime(dateString) {
+        return new Date(dateString).toLocaleTimeString('en-IN', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    // Validate email
+    validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    // Validate password
+    validatePassword(password) {
+        return password.length >= 6;
+    }
+
+    // Debounce function
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Copy to clipboard
+    async copyToClipboard(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            this.showNotification('Copied to clipboard!', 'success');
+            return true;
+        } catch (err) {
+            console.error('Failed to copy: ', err);
+            this.showNotification('Failed to copy', 'error');
+            return false;
+        }
+    }
+
+    // Generate random number in range
+    randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    // Calculate daily check-in reward
+    calculateDailyReward(streak) {
+        const baseReward = 0.10;
+        const increment = 0.15;
+        return Math.min(baseReward + (streak - 1) * increment, 1.00);
+    }
+
+    // Check if today's check-in is done
+    async checkTodaysCheckin(userId) {
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const { data: user, error } = await this.supabase
+                .from('users')
+                .select('last_checkin')
+                .eq('id', userId)
+                .single();
+
+            if (error) throw error;
+
+            return user.last_checkin === today;
+        } catch (error) {
+            console.error('Error checking today\'s check-in:', error);
+            return false;
+        }
+    }
+
+    // Get today's earnings
+    async getTodaysEarnings(userId, type = null) {
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            let query = this.supabase
+                .from('earnings')
+                .select('amount')
+                .eq('user_id', userId)
+                .gte('created_at', today + 'T00:00:00')
+                .lte('created_at', today + 'T23:59:59');
+
+            if (type) {
+                query = query.eq('type', type);
+            }
+
+            const { data, error } = await query;
+
+            if (error) throw error;
+
+            const total = data?.reduce((sum, earning) => sum + earning.amount, 0) || 0;
+            const count = data?.length || 0;
+
+            return { total, count, error: null };
+        } catch (error) {
+            console.error('Error getting today\'s earnings:', error);
+            return { total: 0, count: 0, error };
+        }
     }
 }
 
-async function scratchCard() {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return { success: false, message: 'Not authenticated' };
+// Initialize action manager
+window.actionManager = new ActionManager();
 
-        // Check daily limit (max 3 scratch cards/day)
-        const todayEarnings = await checkDailyLimit(user.id, 'scratch');
-        if (todayEarnings.length >= 3) {
-            return { success: false, message: 'Daily limit reached (3 scratch cards)' };
-        }
+// Global utility functions
+window.utils = {
+    // Generate unique ID
+    generateId: () => {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    },
 
-        // Generate random coins between 5-50
-        const coins = Math.floor(Math.random() * 46) + 5;
+    // Sleep function
+    sleep: (ms) => {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    },
 
-        // Update coins and add earning record
-        const coinUpdated = await updateCoins(user.id, coins, 'earn', 'scratch');
-        const recordAdded = await addEarningRecord(user.id, 'scratch', coins);
+    // Check mobile device
+    isMobile: () => {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    },
 
-        if (coinUpdated && recordAdded) {
-            return { success: true, coins: coins };
-        } else {
-            return { success: false, message: 'Failed to process earning' };
-        }
-    } catch (error) {
-        console.error('Scratch card error:', error);
-        return { success: false, message: 'An error occurred' };
+    // Get screen size
+    getScreenSize: () => {
+        const width = window.innerWidth;
+        if (width < 768) return 'mobile';
+        if (width < 1024) return 'tablet';
+        return 'desktop';
     }
-}
-
-async function dailyCheckin() {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return { success: false, message: 'Not authenticated' };
-
-        // Get user data
-        const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-
-        if (userError) throw userError;
-
-        const today = new Date().toISOString().split('T')[0];
-        const lastCheckin = userData.last_checkin;
-
-        let streak = userData.daily_streak || 0;
-        let coins = 0;
-
-        // Check if already checked in today
-        if (lastCheckin === today) {
-            return { success: false, message: 'Already checked in today' };
-        }
-
-        // Calculate streak and coins
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().split('T')[0];
-
-        if (lastCheckin === yesterdayStr) {
-            streak += 1;
-        } else {
-            streak = 1;
-        }
-
-        // Calculate coins based on streak (Day1:10 → Day7:100)
-        coins = Math.min(10 + (streak - 1) * 15, 100);
-
-        // Update user data
-        const { error: updateError } = await supabase
-            .from('users')
-            .update({
-                daily_streak: streak,
-                last_checkin: today
-            })
-            .eq('id', user.id);
-
-        if (updateError) throw updateError;
-
-        // Add coins and earning record
-        const coinUpdated = await updateCoins(user.id, coins, 'earn', 'checkin');
-        const recordAdded = await addEarningRecord(user.id, 'checkin', coins);
-
-        if (coinUpdated && recordAdded) {
-            return { success: true, coins: coins, streak: streak };
-        } else {
-            return { success: false, message: 'Failed to process checkin' };
-        }
-    } catch (error) {
-        console.error('Daily checkin error:', error);
-        return { success: false, message: 'An error occurred' };
-    }
-}
-
-async function openTreasure() {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return { success: false, message: 'Not authenticated' };
-
-        // Check daily limit (max 1 treasure/day)
-        const todayEarnings = await checkDailyLimit(user.id, 'treasure');
-        if (todayEarnings.length >= 1) {
-            return { success: false, message: 'Daily limit reached (1 treasure)' };
-        }
-
-        // Generate random coins between 20-200
-        const coins = Math.floor(Math.random() * 181) + 20;
-
-        // Update coins and add earning record
-        const coinUpdated = await updateCoins(user.id, coins, 'earn', 'treasure');
-        const recordAdded = await addEarningRecord(user.id, 'treasure', coins);
-
-        if (coinUpdated && recordAdded) {
-            return { success: true, coins: coins };
-        } else {
-            return { success: false, message: 'Failed to process treasure' };
-        }
-    } catch (error) {
-        console.error('Treasure error:', error);
-        return { success: false, message: 'An error occurred' };
-    }
-}
+};
