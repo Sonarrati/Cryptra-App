@@ -410,40 +410,28 @@
         }
 
         function showVideo() {
-        // watch.html में ये function replace करें
-async function startVideo() {
-    try {
-        console.log('Starting video...');
-        
-        // Show loading
-        elements.loadingState.classList.remove('hidden');
-        elements.watchButton.disabled = true;
+            try {
+                console.log('Showing video...');
+                
+                elements.loadingState.classList.add('hidden');
+                
+                // Show active video state
+                elements.activeAdState.classList.remove('hidden');
+                elements.countdownState.classList.remove('hidden');
 
-        // Use simple coin manager
-        const result = await window.coinManager.watchVideo(currentUser.id);
-        
-        if (result.success) {
-            // Show success
-            elements.loadingState.classList.add('hidden');
-            elements.resultState.classList.remove('hidden');
-            elements.earnedMoney.textContent = `₹${result.earned.toFixed(2)}`;
-            
-            showNotification(`🎉 +₹${result.earned.toFixed(2)} earned!`, 'success');
-            
-            // Reload data
-            await loadTodayEarnings();
-            await loadRecentEarnings();
-        } else {
-            throw new Error(result.error);
+                // Load external video
+                loadExternalVideo();
+
+                // Start countdown
+                startCountdown();
+
+            } catch (error) {
+                console.error('Show video error:', error);
+                resetVideo();
+                showNotification('Failed to load video', 'error');
+            }
         }
 
-    } catch (error) {
-        console.error('Start video error:', error);
-        elements.loadingState.classList.add('hidden');
-        elements.watchButton.disabled = false;
-        showNotification(error.message || 'Failed to process video', 'error');
-    }
-}
         function loadExternalVideo() {
             try {
                 console.log('Loading external video from:', VIDEO_URL);
